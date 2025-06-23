@@ -1,0 +1,641 @@
+{
+    "designSystem": {
+      "name": "Modern Fitness App UI",
+      "version": "1.0",
+      "description": "Clean, modern mobile fitness application design system with dark theme focus"
+    },
+    "formPatterns": {
+      "onboardingForms": {
+        "socialAuth": {
+          "appleButton": "Black with white Apple logo and text",
+          "googleButton": "White with colorful Google logo (if needed)",
+          "buttonHeight": "50px",
+          "buttonSpacing": "12px vertical between options"
+        },
+       "workoutManagement": {
+      "workoutSession": {
+        "emptyState": {
+          "structure": "Stats header + central icon + CTA + secondary actions",
+          "statsDisplay": {
+            "layout": "Three-column grid (Duration, Volume, Series)",
+            "labelStyle": "14px, muted color, uppercase or regular case",
+            "valueStyle": "24px, bold, accent color for active values"
+          },
+          "centerIcon": {
+            "style": "Large dumbbell icon, outline style, muted color",
+            "size": "80-100px",
+            "positioning": "Centered vertically in available space"
+          },
+          "primaryCTA": {
+            "text": "Agregar Ejercicio",
+            "style": "Full-width blue button with plus icon",
+            "positioning": "Below center content"
+          },
+          "secondaryActions": {
+            "configuration": "Dark button with neutral styling",
+            "discard": "Red text button for destructive action",
+            "layout": "Side-by-side below primary CTA"
+          }
+        },
+        "activeSession": {
+          "headerActions": {
+            "collapse": "Chevron down for workout name",
+            "timer": "Clock icon for session timing",
+            "finish": "Blue pill button, prominent positioning"
+          },
+          "progressIndicator": "Resume/Discard options at bottom when paused"
+        }
+      },
+      "routineLibrary": {
+        "structure": "Quick start + routine groups + routine cards",
+        "quickStart": {
+          "emptyWorkout": "Plus icon + text, dark background",
+          "prominence": "Top of screen, easy access"
+        },
+        "routineGroups": {
+          "layout": "Collapsible sections with routine count",
+          "groupHeader": {
+            "style": "Chevron + group name + count in parentheses",
+            "interaction": "Tap to expand/collapse"
+          },
+          "groupStates": {
+            "collapsed": "Chevron right, content hidden",
+            "expanded": "Chevron down, content visible"
+          }
+        },
+        "routineCards": {
+          "layout": "Card with title, exercise preview, start button",
+          "exercisePreview": "Truncated list of exercise names",
+          "startButton": "Full-width blue button within card"
+        }
+      }
+    },
+      "settingsScreen": {
+        "structure": "Header + settings list + footer info + bottom navigation",
+        "headerTreatment": {
+          "title": "Large title (32px), bold weight",
+          "subtitle": "App name or user identifier (14px, muted)",
+          "spacing": "24px bottom margin"
+        "settingsNavigation": {
+        "backButton": {
+          "style": "Left-pointing chevron or back arrow",
+          "positioning": "Top-left, consistent with iOS patterns",
+          "touchTarget": "44x44px minimum"
+        "settingsData": {
+      "firebaseIntegration": {
+        "userPreferences": {
+          "collection": "users/{uid}/preferences",
+          "fields": ["notifications", "display", "workspace"],
+          "realTimeSync": "Listen to preference changes across devices"
+        },
+        "logoutFlow": {
+          "confirmationAlert": "Native iOS alert with confirmation",
+          "firebaseSignOut": "Firebase Auth signOut() method",
+          "dataCleanup": "Clear local storage and cached data",
+          "navigation": "Return to authentication flow"
+        }
+      },
+      "settingsCategories": {
+        "account": ["workspace", "profile", "subscription"],
+        "preferences": ["notifications", "display", "privacy"],
+        "support": ["rate", "feedback", "help", "privacy"],
+        "system": ["version", "logout"]
+      }
+    },
+        "drillDown": {
+          "transition": "Slide from right (iOS push navigation)",
+          "breadcrumbs": "Implied through back button and title",
+          "persistence": "Remember scroll position on return"
+        }
+      },
+        "listLayout": {
+          "itemHeight": "56px minimum touch target",
+          "itemPadding": "16px horizontal, 16px vertical",
+          "itemSpacing": "1px separator or no gap",
+          "groupSpacing": "24px between logical groups"
+        }
+      },
+      "settingsItems": {
+        "standardItem": {
+          "structure": "Label + value/status + chevron",
+          "labelStyle": "16px, medium weight, dark text",
+          "valueStyle": "16px, regular weight, muted text",
+          "chevronStyle": "Gray chevron-right icon (16px)"
+        },
+        "toggleItem": {
+          "structure": "Label + iOS-style toggle switch",
+          "switchStyle": "iOS native switch component",
+          "switchColors": {
+            "enabled": "#34C759 (iOS green)",
+            "disabled": "#E5E5EA (iOS gray)"
+          }
+        },
+        "destructiveItem": {
+          "labelStyle": "16px, medium weight, red text (#FF3B30)",
+          "iconTreatment": "Optional red icon (logout, delete)",
+          "positioning": "Typically at bottom, separated from other items"
+        }
+      },
+      "detailScreens": {
+        "notificationSettings": {
+          "structure": "Header + toggle groups + system link",
+          "toggleGroups": [
+            "Primary notifications (push notifications)",
+            "Scheduling options (notification schedule)",
+            "System integration (system notification settings)"
+          ],
+          "systemLink": {
+            "text": "System notification settings",
+            "style": "Blue link with chevron",
+            "action": "Opens iOS Settings app"
+          }
+        }
+      }
+    },
+      "onboardingGoals": {
+        "quickStart": "Minimize friction to first valuable interaction",
+        "trustBuilding": "Professional design builds confidence",
+        "valueDemo": "Show app benefits before requiring commitment",
+        "socialProof": "Leverage Apple Sign-In for trust"
+      },
+      "authenticationUX": {
+        "optionHierarchy": "Apple Sign-In as primary, email as fallback",
+        "formProgression": "Logical flow from general to specific info",
+        "errorRecovery": "Clear paths to resolve auth issues",
+        "accessibility": "VoiceOver support, proper form labels"
+      },
+      "retentionTactics": {
+        "seamlessOnboarding": "Minimize steps to core functionality",
+        "personalizedWelcome": "Use authenticated user data for customization",
+        "guidedFirstUse": "Tooltips or tutorial for key features"
+      }
+    },
+        "emailForm": {
+          "emailValidation": "Real-time email format checking",
+          "passwordStrength": "Visual indicator for password requirements",
+          "submitStates": ["default", "loading", "success", "error"],
+          "autofocus": "Email field on form load"
+        },
+        "progressIndicators": {
+          "stepCounter": "When multi-step onboarding",
+          "loadingStates": "Spinner on buttons during API calls",
+          "successFeedback": "Checkmarks or success animations"
+        }
+      },
+      "editingStates": {
+        "inactive": "Display mode with clear visual hierarchy",
+        "active": "Input mode with focused fields and keyboard",
+        "validation": "Real-time feedback for invalid entries"
+      "firebasePatterns": {
+      "authStates": {
+        "unauthenticated": "Show onboarding flow",
+        "loading": "Display loading spinner during auth check",
+        "authenticated": "Navigate to main app",
+        "error": "Show error message with retry option"
+      },
+      "authMethods": {
+        "appleSignIn": "Firebase Auth Apple provider",
+        "emailPassword": "Firebase Auth email/password",
+        "anonymousAuth": "Optional for guest users"
+      },
+      "userProfile": {
+        "creation": "Auto-create Firestore user document on first sign-in",
+        "fields": ["email", "displayName", "photoURL", "createdAt", "lastLoginAt"],
+        "collection": "users/{uid}"
+      },
+      "errorHandling": {
+        "authErrors": "User-friendly messages for common Firebase Auth errors",
+        "networkErrors": "Offline capability with retry mechanisms",
+        "validation": "Client-side validation before Firebase calls"
+      }
+    },
+      "actionButtons": {
+        "cancel": "Text button, blue color, left alignment",
+        "save": "Filled button, blue background, right alignment",
+        "destructive": "Red text for delete actions"
+      },
+      "inputFields": {
+        "numeric": "Right-aligned text for weights and reps",
+        "range": "Two connected inputs with separator",
+        "readonly": "Muted appearance for calculated fields"
+      }
+    },
+    "colorPalette": {
+      "primary": {
+        "vibrantOrange": "#FF6B35",
+        "gradientRed": "#FF4500",
+        "accentBlue": "#4A90E2",
+        "brightGreen": "#7ED321"
+      "routineCards": {
+        "structure": "Vertical stack with title, description, and action button",
+        "titleStyle": "18px, semibold, dark text",
+        "descriptionStyle": "14px, regular, muted text with exercise preview",
+        "actionButton": "Full-width blue button at bottom of card",
+        "cardSpacing": "24px vertical between cards",
+        "cardPadding": "16px all sides"
+      },
+      "quickActions": {
+        "layout": "Horizontal button group or single prominent action",
+        "startEmptyWorkout": "Plus icon + text, subtle background",
+        "newRoutine": "Document icon + text",
+        "explore": "Search icon + text"
+      },
+      "neutral": {
+        "darkBackground": "#1A1A1A",
+        "cardBackground": "#2A2A2A",
+        "lightBackground": "#FFFFFF",
+        "textPrimary": "#FFFFFF",
+        "textSecondary": "#9B9B9B",
+        "textTertiary": "#666666"
+      },
+      "semantic": {
+        "success": "#7ED321",
+        "warning": "#F5A623",
+        "error": "#D0021B",
+        "info": "#4A90E2"
+      }
+    },
+    "typography": {
+      "fontFamily": {
+        "primary": "SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif",
+        "secondary": "SF Pro Text, -apple-system, BlinkMacSystemFont, sans-serif"
+      },
+      "hierarchy": {
+        "hero": {
+          "fontSize": "32px",
+          "fontWeight": "700",
+          "lineHeight": "1.2",
+          "letterSpacing": "-0.02em"
+        },
+        "h1": {
+          "fontSize": "28px",
+          "fontWeight": "600",
+          "lineHeight": "1.3"
+        },
+        "h2": {
+          "fontSize": "20px",
+          "fontWeight": "600",
+          "lineHeight": "1.4"
+        },
+        "body": {
+          "fontSize": "16px",
+          "fontWeight": "400",
+          "lineHeight": "1.5"
+        },
+        "caption": {
+          "fontSize": "14px",
+          "fontWeight": "400",
+          "lineHeight": "1.4",
+          "opacity": 0.7
+        },
+        "small": {
+          "fontSize": "12px",
+          "fontWeight": "500",
+          "lineHeight": "1.3"
+        }
+      }
+    },
+    "spacing": {
+      "xs": "4px",
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px",
+      "xxl": "48px"
+    },
+    "borderRadius": {
+      "small": "8px",
+      "medium": "12px",
+      "large": "16px",
+      "pill": "999px",
+      "circle": "50%"
+    },
+    "onboardingSystem": {
+      "splashScreen": {
+        "background": "Solid brand color (#4A90E2 or similar vibrant blue)",
+        "logoTreatment": "Large white logo/icon centered",
+        "logoSize": "80-120px",
+        "animation": "Subtle fade-in or scale animation",
+        "duration": "2-3 seconds before transition"
+      },
+      "loadingScreen": {
+        "background": "Same as splash screen for continuity",
+        "loadingIndicator": "Subtle spinner or animated logo",
+        "positioning": "Centered vertically and horizontally",
+        "minimumDuration": "Ensure smooth transition, no flash"
+      },
+      "welcomeFlow": {
+        "structure": "Hero content + value proposition + primary CTA",
+        "background": "Light background (#FFFFFF or #F8F9FA)",
+        "contentAlignment": "Center-aligned with generous spacing",
+        "phonePreview": {
+          "style": "3D isometric phone mockup with app preview",
+          "positioning": "Prominently displayed above fold",
+          "shadow": "Realistic drop shadow for depth"
+        }
+      }
+    },
+    "authentication": {
+      "firebaseIntegration": {
+        "appleSignIn": {
+          "style": "Black button with Apple logo",
+          "text": "Continue with Apple",
+          "borderRadius": "25px (pill shape)",
+          "height": "50px",
+          "fontWeight": "600"
+        },
+        "emailSignUp": {
+          "fallbackOption": "or sign up with email",
+          "textStyle": "Muted color, smaller size",
+          "positioning": "Below social auth options"
+        },
+        "formValidation": "Real-time validation with Firebase Auth rules"
+      },
+      "signUpForm": {
+        "structure": "Email field + Password field + Submit button",
+        "fieldSpacing": "16px vertical between inputs",
+        "inputStyle": {
+          "background": "Light gray (#F5F5F5)",
+          "borderRadius": "8px",
+          "padding": "16px horizontal, 12px vertical",
+          "borderStyle": "None, background color only"
+        },
+        "passwordRequirements": {
+          "display": "Small text below password field",
+          "text": "8+ characters, uppercase, lowercase, number",
+          "color": "Muted text color"
+        },
+        "submitButton": {
+          "style": "Full-width, black background",
+          "text": "Sign Up",
+          "state": "Disabled until validation passes"
+        }
+      },
+      "legalCompliance": {
+        "positioning": "Bottom of form, small text",
+        "content": "Terms and Conditions and Privacy Statement links",
+        "textSize": "12px",
+        "lineHeight": "1.4"
+      }
+    },
+      "mobileScreen": {
+        "structure": "Full-height container with status bar, main content, and bottom navigation",
+        "padding": "16px horizontal, varies vertical",
+        "safeArea": "Respects iOS safe areas",
+        "maxWidth": "414px"
+      },
+      "editingInterface": {
+        "structure": "Modal or full-screen with Cancel/Update header actions",
+        "headerActions": {
+          "cancel": "Left-aligned, blue text button",
+          "title": "Centered, medium weight",
+          "update": "Right-aligned, blue filled button"
+        },
+        "contentPadding": "16px horizontal"
+      },
+      "dataEntryTable": {
+        "structure": "Tabular layout with editable cells",
+        "columns": {
+          "set": "Narrow, sequential numbering",
+          "weight": "Editable input with kg suffix",
+          "repRange": "Two inputs with 'to' separator"
+        },
+        "warmupIndicator": "Yellow 'W' badge for warmup sets",
+        "rowSpacing": "12px vertical between rows",
+        "inputStyle": "Borderless with light background on focus"
+      },
+      "numericKeypad": {
+        "layout": "3x4 grid with additional function keys",
+        "buttonSize": "Equal width/height squares",
+        "buttonStyle": "Light background, dark text, rounded corners",
+        "specialKeys": ["ABC", "DEF", clear, decimal],
+        "positioning": "Bottom sheet overlay"
+      },
+      "folderSelector": {
+        "presentation": "Modal overlay with rounded top corners",
+        "itemLayout": "List with folder icons and names",
+        "itemSpacing": "16px vertical padding per item",
+        "iconStyle": "Folder outline icons, consistent sizing"
+      },
+      "heroSection": {
+        "layout": "Full-width background with overlay content",
+        "backgroundTreatment": "Vibrant gradient or dynamic image with blur/overlay",
+        "contentAlignment": "Left-aligned with generous vertical spacing",
+        "textColor": "White for contrast over dark backgrounds"
+      },
+      "statusBar": {
+        "style": "Light content on dark backgrounds, dark on light",
+        "elements": ["time", "signal", "wifi", "battery"],
+        "positioning": "Fixed top with safe area padding"
+      },
+      "navigationHeader": {
+        "height": "44px minimum",
+        "elements": {
+          "backButton": "Chevron left icon",
+          "title": "Centered, medium weight",
+          "actionButton": "Right-aligned, often 'Finish' or menu"
+        },
+        "style": "Minimal with subtle background"
+      },
+      "cards": {
+        "primary": {
+          "background": "Dark (#2A2A2A) or light (#FFFFFF)",
+          "borderRadius": "12px",
+          "padding": "16px",
+          "shadow": "Subtle drop shadow",
+          "spacing": "16px between cards"
+        },
+        "exercise": {
+          "structure": "Icon/image + title + description + action area",
+          "iconSize": "40x40px",
+          "titleStyle": "Medium weight, primary color",
+          "descriptionStyle": "Secondary text color, smaller size"
+        }
+      },
+      "buttons": {
+        "primary": {
+          "style": "Solid background, pill-shaped",
+          "padding": "12px 24px",
+          "borderRadius": "25px",
+          "fontSize": "16px",
+          "fontWeight": "600"
+        },
+        "secondary": {
+          "style": "Outlined or subtle background",
+          "padding": "10px 20px",
+          "borderRadius": "20px"
+        },
+        "floating": {
+          "style": "Large, prominent, often at bottom",
+          "background": "White or accent color",
+          "shadow": "Pronounced shadow for elevation"
+        }
+      },
+      "dataTable": {
+        "structure": "Header row + data rows with alternating backgrounds",
+        "headerStyle": "Small caps, muted color",
+        "rowPadding": "12px vertical, 8px horizontal",
+        "alternatingRows": "Light green (#7ED321) with transparency",
+        "columns": ["SET", "WEIGHT", "REPS", "RPE", "COMPLETION"],
+        "alignment": "Center-aligned numbers, left-aligned text"
+      },
+      "bottomNavigation": {
+        "height": "80px including safe area",
+        "itemCount": "4-5 items",
+        "iconSize": "24x24px",
+        "labelStyle": "10px, medium weight",
+        "activeState": "Filled icon + accent color",
+        "badge": "Small circular indicator for notifications"
+      },
+      "chips": {
+        "style": "Small rounded rectangles",
+        "padding": "4px 8px",
+        "fontSize": "12px",
+        "use": "Tags, categories, status indicators"
+      },
+      "modals": {
+        "overlay": "Semi-transparent dark background",
+        "content": "Rounded corners, centered or bottom-sheet style",
+        "dismissal": "X button, swipe gesture, or tap outside"
+      },
+      "timers": {
+        "display": "Large, prominent text",
+        "style": "Monospace or system font",
+        "color": "Accent blue for active timers",
+        "iconography": "Clock icon prefix"
+      }
+    },
+    "layoutPatterns": {
+      "settingsFlow": {
+        "mainSettings": "Full-screen list with bottom navigation visible",
+        "detailSettings": "Full-screen with back navigation, no bottom nav",
+        "modalSettings": "When editing specific values (rare in this pattern)",
+        "scrollBehavior": "Natural scroll with no sticky elements except nav"
+      },
+      "onboardingFlow": {
+        "splashToLoading": "Seamless transition maintaining brand color",
+        "loadingToWelcome": "Fade transition to light background",
+        "welcomeToAuth": "Modal or slide-up presentation",
+        "progression": "Linear flow with clear forward navigation"
+      },
+      "authenticationScreens": {
+        "structure": "Header + hero content + form + footer",
+        "headerTreatment": {
+          "title": "Large, bold heading (24-28px)",
+          "subtitle": "Supporting text below title",
+          "backButton": "Minimal back arrow (top-left)"
+        },
+        "formLayout": {
+          "width": "Full width with 16px horizontal padding",
+          "maxWidth": "400px centered",
+          "fieldGrouping": "Logical sections with visual separation"
+        },
+        "ctaPlacement": "Primary action prominent, secondary actions subtle"
+      },
+      "workoutEditor": {
+        "structure": "Header + exercise details + data table + numeric input",
+        "scrollBehavior": "Vertical scroll with sticky header",
+        "dataInput": "Inline editing with immediate feedback",
+        "keyboardHandling": "Custom numeric keypad for weight/rep entry"
+      },
+      "routineLibrary": {
+        "structure": "Quick actions + routine cards + folder organization",
+        "cardLayout": "Vertical stack with consistent spacing",
+        "actionHierarchy": "Primary actions prominent, secondary actions subtle",
+        "folderManagement": "Modal selection with clear organization"
+      },
+      "onboarding": {
+        "structure": "Hero image/gradient + headline + description + CTA buttons",
+        "buttonHierarchy": "Primary action prominent, secondary below",
+        "spacing": "Generous vertical spacing between elements"
+      },
+      "workoutDetail": {
+        "structure": "Header + exercise cards + floating action button",
+        "scrollBehavior": "Vertical scroll with fixed header",
+        "exerciseLayout": "Card per exercise with collapsible details"
+      },
+      "workoutSession": {
+        "structure": "Timer header + current exercise + data input + next exercise preview",
+        "dataEntry": "Table format with editable cells",
+        "progression": "Visual indicators for set completion"
+      }
+    },
+    "interactions": {
+      "settingsInteractions": {
+        "itemTaps": {
+          "navigation": "Immediate navigation with slide transition",
+          "toggles": "Immediate state change with animation",
+          "destructive": "May show confirmation alert before action"
+        },
+        "toggleAnimations": {
+          "switchSlide": "Smooth slide animation matching iOS defaults",
+          "stateChange": "Immediate visual feedback",
+          "persistence": "Save state immediately to backend/storage"
+        },
+        "confirmationPatterns": {
+          "logout": "Alert with 'Cancel' and 'Log Out' options",
+          "destructiveActions": "Clear warning with action confirmation",
+          "systemSettings": "Graceful handoff to iOS Settings app"
+        }
+      },
+      "dataEntry": {
+        "tapToEdit": "Single tap activates input field",
+        "customKeyboard": "Numeric keypad slides up from bottom",
+        "rangeInput": "Two separate inputs connected with 'to' label",
+        "autoAdvance": "Tab to next field after entry completion"
+      },
+      "restTimers": {
+        "presentation": "Modal overlay with preset time options",
+        "timeSelection": "Vertical list with common durations",
+        "customTime": "Manual input option available",
+        "confirmAction": "Done button to apply selection"
+      },
+      "transitions": {
+        "screenChange": "Slide from right, fade, or modal presentation",
+        "cardExpansion": "Smooth scale and fade",
+        "buttonPress": "Subtle scale down (0.95) with haptic"
+      },
+      "gestures": {
+        "swipe": "Horizontal swipe for navigation or dismissal",
+        "tap": "Primary interaction for buttons and cards",
+        "longPress": "Context menus or additional options"
+      },
+      "feedback": {
+        "visual": "Color changes, scale animations",
+        "haptic": "Light impact for selections, medium for confirmations",
+        "loading": "Skeleton screens or subtle spinners"
+      }
+    },
+    "iconography": {
+      "style": "Line-based with consistent stroke width",
+      "weight": "Medium (2px stroke)",
+      "sizes": {
+        "small": "16x16px",
+        "medium": "24x24px", 
+        "large": "32x32px"
+      },
+      "categories": ["navigation", "exercise", "time", "data", "social"]
+    },
+    "darkModeSupport": {
+      "primaryTheme": "Dark mode as default",
+      "adaptiveElements": "Status bar, text colors, card backgrounds",
+      "contrastRatio": "4.5:1 minimum for text",
+      "accentColors": "Remain vibrant in both themes"
+    },
+    "accessibility": {
+      "touchTargets": "44x44px minimum",
+      "textScaling": "Supports dynamic type",
+      "colorContrast": "WCAG AA compliant",
+      "voiceOver": "Semantic labels for all interactive elements"
+    },
+    "brandElements": {
+      "logoTreatment": "Bold, uppercase wordmarks",
+      "colorMeaning": {
+        "orange": "Energy, motivation, primary brand",
+        "green": "Success, completion, progress",
+        "blue": "Information, timing, secondary actions"
+      },
+      "personality": "Modern, energetic, professional, motivational"
+    }
+  }
+}

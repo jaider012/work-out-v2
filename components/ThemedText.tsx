@@ -1,11 +1,12 @@
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
+import { Typography } from '@/constants/Typography';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+  type?: 'default' | 'hero' | 'h1' | 'h2' | 'body' | 'caption' | 'small' | 'button' | 'link';
 };
 
 export function ThemedText({
@@ -20,11 +21,15 @@ export function ThemedText({
   return (
     <Text
       style={[
-        { color },
+        { color, fontFamily: Typography.fontFamily.system },
         type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
-        type === 'subtitle' ? styles.subtitle : undefined,
+        type === 'hero' ? styles.hero : undefined,
+        type === 'h1' ? styles.h1 : undefined,
+        type === 'h2' ? styles.h2 : undefined,
+        type === 'body' ? styles.body : undefined,
+        type === 'caption' ? styles.caption : undefined,
+        type === 'small' ? styles.small : undefined,
+        type === 'button' ? styles.button : undefined,
         type === 'link' ? styles.link : undefined,
         style,
       ]}
@@ -35,26 +40,51 @@ export function ThemedText({
 
 const styles = StyleSheet.create({
   default: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: Typography.hierarchy.body.fontSize,
+    lineHeight: Typography.hierarchy.body.lineHeight,
+    fontWeight: Typography.hierarchy.body.fontWeight,
   },
-  defaultSemiBold: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '600',
+  hero: {
+    fontSize: Typography.hierarchy.hero.fontSize,
+    lineHeight: Typography.hierarchy.hero.lineHeight,
+    fontWeight: Typography.hierarchy.hero.fontWeight,
+    letterSpacing: Typography.hierarchy.hero.letterSpacing,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    lineHeight: 32,
+  h1: {
+    fontSize: Typography.hierarchy.h1.fontSize,
+    lineHeight: Typography.hierarchy.h1.lineHeight,
+    fontWeight: Typography.hierarchy.h1.fontWeight,
   },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  h2: {
+    fontSize: Typography.hierarchy.h2.fontSize,
+    lineHeight: Typography.hierarchy.h2.lineHeight,
+    fontWeight: Typography.hierarchy.h2.fontWeight,
+  },
+  body: {
+    fontSize: Typography.hierarchy.body.fontSize,
+    lineHeight: Typography.hierarchy.body.lineHeight,
+    fontWeight: Typography.hierarchy.body.fontWeight,
+  },
+  caption: {
+    fontSize: Typography.hierarchy.caption.fontSize,
+    lineHeight: Typography.hierarchy.caption.lineHeight,
+    fontWeight: Typography.hierarchy.caption.fontWeight,
+    opacity: Typography.hierarchy.caption.opacity,
+  },
+  small: {
+    fontSize: Typography.hierarchy.small.fontSize,
+    lineHeight: Typography.hierarchy.small.lineHeight,
+    fontWeight: Typography.hierarchy.small.fontWeight,
+  },
+  button: {
+    fontSize: Typography.ui.button.fontSize,
+    lineHeight: Typography.ui.button.lineHeight,
+    fontWeight: Typography.ui.button.fontWeight,
   },
   link: {
-    lineHeight: 30,
-    fontSize: 16,
-    color: '#0a7ea4',
+    fontSize: Typography.hierarchy.body.fontSize,
+    lineHeight: Typography.hierarchy.body.lineHeight,
+    fontWeight: Typography.hierarchy.body.fontWeight,
+    color: '#4A90E2',
   },
 });
