@@ -14,30 +14,50 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
+            backgroundColor: Colors.neutral.cardBackground,
           },
-          default: {},
+          default: {
+            backgroundColor: Colors.neutral.cardBackground,
+          },
         }),
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '500',
+        },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Workouts',
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="dumbbell" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="routines"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Routines',
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="list.bullet" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="progress"
+        options={{
+          title: 'Progress',
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="chart.line.uptrend.xyaxis" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="gearshape.fill" color={color} />,
         }}
       />
     </Tabs>
