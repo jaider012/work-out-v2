@@ -49,6 +49,34 @@ export function workoutsInLastDays(workouts: Workout[], days: number): Workout[]
   return workouts.filter((w) => new Date(w.startedAt).getTime() >= cutoff);
 }
 
+/** Weekly volume buckets (oldest → newest), most recent week last. */
+export function volumePerWeek(
+  workouts: Workout[],
+  weekCount = 8,
+  now = new Date(),
+): { weekStart: Date; volumeKg: number }[] {
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  // Move to the most recent Monday so weeks align with ISO calendars.
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  const buckets: { weekStart: Date; volumeKg: number }[] = [];
+  for (let i = weekCount - 1; i >= 0; i -= 1) {
+    const weekStart = new Date(start.getTime() - i * weekMs);
+    buckets.push({ weekStart, volumeKg: 0 });
+  }
+  for (const workout of workouts) {
+    const ts = new Date(workout.startedAt).getTime();
+    const idx = buckets.findIndex(
+      (b) => ts >= b.weekStart.getTime() && ts < b.weekStart.getTime() + weekMs,
+    );
+    if (idx >= 0) {
+      buckets[idx].volumeKg += computeWorkoutVolumeKg(workout);
+    }
+  }
+  return buckets;
+}
+
 export function formatDuration(seconds: number | undefined) {
   if (!seconds) return '0m';
   const h = Math.floor(seconds / 3600);

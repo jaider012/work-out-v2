@@ -38,6 +38,7 @@ Android emulator, or physical device.
 | `09_body_measurements.yaml` | Log a body weight entry and confirm it surfaces on Profile. |
 | `10_set_types_and_calendar.yaml` | Cycle the set type badge and navigate the history calendar. |
 | `11_banner_and_repeat.yaml` | Persistent banner, Discover copy + equipment filter smoke test. |
+| `12_notes_rpe_and_import.yaml` | Workout notes input, RPE cycling and Settings import button. |
 
 Run them all in order:
 

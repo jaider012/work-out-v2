@@ -1,4 +1,5 @@
 import { File, Paths } from 'expo-file-system';
+import * as DocumentPicker from 'expo-document-picker';
 import { useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import React, { useState } from 'react';
@@ -19,9 +20,36 @@ import { useWorkouts } from '@/contexts/WorkoutContext';
 export default function SettingsScreen() {
   const router = useRouter();
   const { weightUnit, setWeightUnit } = useSettings();
-  const { workouts, routines, folders } = useWorkouts();
+  const { workouts, routines, folders, importData } = useWorkouts();
   const { measurements } = useMeasurements();
   const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
+
+  const handleImport = async () => {
+    setImporting(true);
+    try {
+      const pick = await DocumentPicker.getDocumentAsync({
+        type: 'application/json',
+        copyToCacheDirectory: true,
+      });
+      if (pick.canceled || !pick.assets?.length) return;
+      const asset = pick.assets[0];
+      const file = new File(asset.uri);
+      const raw = await file.text();
+      const parsed = JSON.parse(raw);
+      await importData({
+        workouts: parsed.workouts,
+        routines: parsed.routines,
+        folders: parsed.folders,
+      });
+      Alert.alert('Import complete', 'Your data has been restored.');
+    } catch (error) {
+      console.warn('Import failed', error);
+      Alert.alert('Import failed', 'Make sure you selected a workout-v2 export file.');
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const handleExport = async () => {
     setExporting(true);
@@ -115,7 +143,16 @@ export default function SettingsScreen() {
               variant="secondary"
               fullWidth
               onPress={handleExport}
-              disabled={exporting}
+              disabled={exporting || importing}
+            />
+            <View style={{ height: Spacing.sm }} />
+            <Button
+              testID="settings-import"
+              title={importing ? 'Importing…' : 'Import data (JSON)'}
+              variant="outline"
+              fullWidth
+              onPress={handleImport}
+              disabled={importing || exporting}
             />
             <ThemedText type="caption" style={[styles.value, { marginTop: Spacing.sm }]}>
               {workouts.length} workouts · {routines.length} routines · {measurements.length}{' '}

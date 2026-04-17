@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MonthCalendar } from '@/components/MonthCalendar';
@@ -17,8 +17,28 @@ import { computeWorkoutVolumeKg, formatDuration, totalSets } from '@/utils/worko
 
 export default function HistoryScreen() {
   const router = useRouter();
-  const { workouts } = useWorkouts();
+  const { workouts, deleteWorkout } = useWorkouts();
   const { weightUnit } = useSettings();
+
+  const handleLongPress = (workoutId: string, name: string) => {
+    Alert.alert(name, 'Workout actions', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Open', onPress: () => router.push(`/workout/${workoutId}`) },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () =>
+          Alert.alert('Delete workout?', `"${name}" will be removed from history.`, [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Delete',
+              style: 'destructive',
+              onPress: () => deleteWorkout(workoutId),
+            },
+          ]),
+      },
+    ]);
+  };
 
   const [month, setMonth] = useState(() => {
     const d = new Date();
@@ -132,6 +152,8 @@ export default function HistoryScreen() {
                       key={workout.id}
                       activeOpacity={0.8}
                       onPress={() => router.push(`/workout/${workout.id}`)}
+                      onLongPress={() => handleLongPress(workout.id, workout.name)}
+                      delayLongPress={300}
                     >
                       <Card style={styles.workoutCard}>
                         <View style={styles.workoutHeader}>

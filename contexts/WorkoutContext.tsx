@@ -52,6 +52,12 @@ type WorkoutContextValue = {
 
   // routines
   saveRoutine: (routine: Routine) => Promise<Routine>;
+  deleteWorkout: (workoutId: string) => Promise<void>;
+  importData: (payload: {
+    workouts?: Workout[];
+    routines?: Routine[];
+    folders?: RoutineFolder[];
+  }) => Promise<void>;
   deleteRoutine: (routineId: string) => Promise<void>;
   duplicateRoutine: (routineId: string) => Promise<Routine | null>;
   createFolder: (name: string) => Promise<RoutineFolder>;
@@ -368,6 +374,23 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     [activeWorkout],
   );
 
+  const deleteWorkout = useCallback(async (workoutId: string) => {
+    setWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
+  }, []);
+
+  const importData = useCallback(
+    async (payload: {
+      workouts?: Workout[];
+      routines?: Routine[];
+      folders?: RoutineFolder[];
+    }) => {
+      if (payload.workouts) setWorkouts(payload.workouts);
+      if (payload.routines) setRoutines(payload.routines);
+      if (payload.folders) setFolders(payload.folders);
+    },
+    [],
+  );
+
   const saveRoutine = useCallback(async (routine: Routine) => {
     const updated = { ...routine, updatedAt: new Date().toISOString() };
     setRoutines((prev) => {
@@ -437,8 +460,12 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       deleteRoutine,
       duplicateRoutine,
       createFolder,
+      deleteWorkout,
+      importData,
     }),
     [
+      deleteWorkout,
+      importData,
       loading,
       workouts,
       routines,

@@ -49,6 +49,14 @@ function setTypeLabel(type: SetType, index: number) {
   }
 }
 
+const RPE_CYCLE: (number | undefined)[] = [undefined, 6, 7, 8, 9, 10];
+
+function nextRpe(current: number | undefined): number | undefined {
+  const idx = RPE_CYCLE.findIndex((v) => v === current);
+  const next = RPE_CYCLE[(idx + 1) % RPE_CYCLE.length];
+  return next;
+}
+
 function setTypeBadgeStyle(type: SetType) {
   switch (type) {
     case 'warmup':
@@ -295,6 +303,18 @@ export default function ActiveWorkoutScreen() {
             placeholderTextColor={Colors.neutral.textTertiary}
           />
 
+          <TextInput
+            testID="active-workout-notes"
+            value={activeWorkout.notes ?? ''}
+            onChangeText={(text) =>
+              updateActiveWorkout((workout) => ({ ...workout, notes: text }))
+            }
+            placeholder="Workout notes (how did it feel, what changed?)"
+            placeholderTextColor={Colors.neutral.textTertiary}
+            multiline
+            style={styles.workoutNotesInput}
+          />
+
           {activeWorkout.exercises.map((workoutExercise, exerciseIndex) => {
             const exercise = getExerciseById(workoutExercise.exerciseId);
             const previous = previousSession(workouts, workoutExercise.exerciseId);
@@ -374,14 +394,17 @@ export default function ActiveWorkoutScreen() {
                   <ThemedText type="caption" style={[styles.setHeader, { flex: 0.6 }]}>
                     SET
                   </ThemedText>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1.4 }]}>
+                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1.2 }]}>
                     PREVIOUS
                   </ThemedText>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1.1 }]}>
+                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1 }]}>
                     {weightUnit.toUpperCase()}
                   </ThemedText>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 0.9 }]}>
+                  <ThemedText type="caption" style={[styles.setHeader, { flex: 0.8 }]}>
                     REPS
+                  </ThemedText>
+                  <ThemedText type="caption" style={[styles.setHeader, { flex: 0.6 }]}>
+                    RPE
                   </ThemedText>
                   <ThemedText
                     type="caption"
@@ -425,8 +448,8 @@ export default function ActiveWorkoutScreen() {
                           </ThemedText>
                         ) : null}
                       </View>
-                      <ThemedText type="caption" style={[styles.previousText, { flex: 1.4 }]}>
-                        {prev ? `${fromKg(prev.weight, weightUnit)} ${weightUnit} × ${prev.reps}` : '—'}
+                      <ThemedText type="caption" style={[styles.previousText, { flex: 1.2 }]}>
+                        {prev ? `${fromKg(prev.weight, weightUnit)} × ${prev.reps}` : '—'}
                       </ThemedText>
                       <TextInput
                         testID={`set-weight-${workoutExercise.id}-${index}`}
@@ -440,7 +463,7 @@ export default function ActiveWorkoutScreen() {
                         keyboardType="decimal-pad"
                         placeholder={prev ? String(fromKg(prev.weight, weightUnit)) : '0'}
                         placeholderTextColor={Colors.neutral.textTertiary}
-                        style={[styles.setInput, { flex: 1.1 }]}
+                        style={[styles.setInput, { flex: 1 }]}
                       />
                       <TextInput
                         testID={`set-reps-${workoutExercise.id}-${index}`}
@@ -453,8 +476,22 @@ export default function ActiveWorkoutScreen() {
                         keyboardType="number-pad"
                         placeholder={prev ? String(prev.reps) : '0'}
                         placeholderTextColor={Colors.neutral.textTertiary}
-                        style={[styles.setInput, { flex: 0.9 }]}
+                        style={[styles.setInput, { flex: 0.8 }]}
                       />
+                      <TouchableOpacity
+                        testID={`set-rpe-${workoutExercise.id}-${index}`}
+                        onPress={() =>
+                          updateSet(workoutExercise.id, set.id, {
+                            rpe: nextRpe(set.rpe),
+                          })
+                        }
+                        activeOpacity={0.7}
+                        style={[styles.rpeButton, { flex: 0.6 }]}
+                      >
+                        <ThemedText type="body" style={styles.rpeText}>
+                          {set.rpe ? `@${set.rpe}` : '—'}
+                        </ThemedText>
+                      </TouchableOpacity>
                       <View style={{ flex: 0.6, alignItems: 'flex-end' }}>
                         <TouchableOpacity
                           testID={`set-check-${workoutExercise.id}-${index}`}
@@ -650,7 +687,16 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     paddingVertical: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
+  workoutNotesInput: {
+    color: Colors.neutral.textPrimary,
+    backgroundColor: Colors.neutral.cardBackground,
+    borderRadius: 10,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
     marginBottom: Spacing.md,
+    minHeight: 48,
   },
   exerciseBlock: {
     backgroundColor: Colors.neutral.cardBackground,
@@ -710,6 +756,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   setTypeBadgeText: { color: Colors.neutral.textPrimary, fontWeight: '700' },
+  rpeButton: {
+    backgroundColor: Colors.neutral.elevatedBackground,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    marginRight: Spacing.xs,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rpeText: { color: Colors.neutral.textPrimary, fontWeight: '600' },
   previousText: { color: Colors.neutral.textTertiary },
   prBadge: {
     color: Colors.semantic.pr,

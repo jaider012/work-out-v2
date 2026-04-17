@@ -20,8 +20,10 @@ import {
   computeWorkoutVolumeKg,
   muscleVolumeMap,
   totalSets,
+  volumePerWeek,
   workoutsInLastDays,
 } from '@/utils/workoutStats';
+import { Sparkline } from '@/components/Sparkline';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -127,6 +129,25 @@ export default function ProfileScreen() {
               <Stat title="Volume" value={`${Math.round(fromKg(stats.totalVolume, weightUnit) / 1000)}t`} />
             </View>
           </Card>
+
+          <Section title="WEEKLY VOLUME (8W)">
+            <Card>
+              <Sparkline
+                values={volumePerWeek(workouts, 8).map((w) => fromKg(w.volumeKg, weightUnit))}
+                width={300}
+                height={72}
+              />
+              <ThemedText type="caption" style={[styles.muted, { marginTop: Spacing.sm }]}>
+                {Math.round(
+                  fromKg(
+                    volumePerWeek(workouts, 1)[0]?.volumeKg ?? 0,
+                    weightUnit,
+                  ),
+                )}{' '}
+                {weightUnit} this week
+              </ThemedText>
+            </Card>
+          </Section>
 
           <Section title="MUSCLE DISTRIBUTION (7D)">
             {muscleEntries.length === 0 ? (

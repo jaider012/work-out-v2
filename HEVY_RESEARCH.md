@@ -139,7 +139,20 @@ yarn e2e:flow .maestro/02_quick_start_workout.yaml
 APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 ```
 
-## 5. Hevy-parity features — iteration 5 update
+## 5. Hevy-parity features — iteration 6 update
+
+- ✅ **Workout notes** field (multiline) at the top of the active workout,
+  saved with the finished workout.
+- ✅ **RPE input per set** via a tap-to-cycle badge: — → @6 → @7 → @8 → @9 →
+  @10 → —.
+- ✅ Long-press a workout in History to open an action sheet with an **Open**
+  or **Delete** option (with confirm).
+- ✅ Weekly volume **sparkline (8 weeks)** on Profile in addition to the
+  existing muscle distribution chart.
+- ✅ **JSON import** from Settings: pick a previously exported file and
+  restore workouts + routines + folders (kept alongside the new Export).
+
+## 6. Hevy-parity features — iteration 5 update
 
 - ✅ Persistent **active workout banner** floats above the tab bar on every
   tab screen. Shows workout name, live elapsed timer and deep-links into the
@@ -154,7 +167,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ **JSON export** from Settings (uses `expo-file-system` + `expo-sharing`)
   to back up workouts, routines, folders and body measurements.
 
-## 6. Hevy-parity features — iteration 4 update
+## 7. Hevy-parity features — iteration 4 update
 
 - ✅ Per-set type badge (Normal / Warmup / Failure / Drop) – tap to cycle
   through states, mirrors Hevy's W / F / D markers. Warmups are excluded
@@ -167,7 +180,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ Active workout header now shows "LAST" — how long ago the last workout
   was logged — alongside volume and sets.
 
-## 7. Hevy-parity features — iteration 3 update
+## 8. Hevy-parity features — iteration 3 update
 
 - ✅ Weight unit preference (kg / lbs) stored in `SettingsContext`, applied to
   every screen that shows volume / weight (home feed, history, profile,
@@ -181,7 +194,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ Settings modal at `/settings` (weight unit toggle + about).
 - ✅ Profile cards now deep-link to Body Measurements and App Settings.
 
-## 8. Hevy-parity features — earlier iterations
+## 9. Hevy-parity features — earlier iterations
 
 - ✅ Routine editor (create / edit / delete, folder picker, ad-hoc folder
   creation) reachable from the Workout tab and via long-press on a routine.
