@@ -71,6 +71,19 @@ export function RoutineEditor({ routineId }: RoutineEditorProps) {
     setExercises((prev) => prev.filter((ex) => ex.id !== id));
   };
 
+  const moveExercise = (id: string, direction: 'up' | 'down') => {
+    setExercises((prev) => {
+      const idx = prev.findIndex((ex) => ex.id === id);
+      if (idx === -1) return prev;
+      const target = direction === 'up' ? idx - 1 : idx + 1;
+      if (target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      const [item] = next.splice(idx, 1);
+      next.splice(target, 0, item);
+      return next;
+    });
+  };
+
   const addSet = (id: string) => {
     setExercises((prev) =>
       prev.map((ex) =>
@@ -185,8 +198,10 @@ export function RoutineEditor({ routineId }: RoutineEditorProps) {
               No exercises yet. Tap “Add exercises” to get started.
             </ThemedText>
           ) : (
-            exercises.map((ex) => {
+            exercises.map((ex, exerciseIndex) => {
               const exercise = getExerciseById(ex.exerciseId);
+              const isFirst = exerciseIndex === 0;
+              const isLast = exerciseIndex === exercises.length - 1;
               return (
                 <View key={ex.id} style={styles.exerciseBlock}>
                   <View style={styles.exerciseHeader}>
@@ -200,7 +215,29 @@ export function RoutineEditor({ routineId }: RoutineEditorProps) {
                         </ThemedText>
                       ) : null}
                     </View>
-                    <TouchableOpacity onPress={() => removeExercise(ex.id)} hitSlop={10}>
+                    <TouchableOpacity
+                      onPress={() => moveExercise(ex.id, 'up')}
+                      hitSlop={6}
+                      disabled={isFirst}
+                      style={{ opacity: isFirst ? 0.3 : 1 }}
+                      testID={`routine-move-up-${ex.id}`}
+                    >
+                      <IconSymbol name="chevron.up" size={18} color={Colors.neutral.textPrimary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => moveExercise(ex.id, 'down')}
+                      hitSlop={6}
+                      disabled={isLast}
+                      style={{ opacity: isLast ? 0.3 : 1, marginLeft: Spacing.sm }}
+                      testID={`routine-move-down-${ex.id}`}
+                    >
+                      <IconSymbol name="chevron.down" size={18} color={Colors.neutral.textPrimary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => removeExercise(ex.id)}
+                      hitSlop={10}
+                      style={{ marginLeft: Spacing.sm }}
+                    >
                       <IconSymbol name="trash" size={18} color={Colors.semantic.error} />
                     </TouchableOpacity>
                   </View>

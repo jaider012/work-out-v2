@@ -9,6 +9,8 @@ import { Card } from '@/components/ui/Card';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
+import { Sparkline } from '@/components/Sparkline';
+import { fromKg, useSettings } from '@/contexts/SettingsContext';
 import { useWorkouts } from '@/contexts/WorkoutContext';
 import { EQUIPMENT_LABELS, MUSCLE_LABELS, getExerciseById } from '@/data/exercises';
 import {
@@ -22,6 +24,7 @@ export default function ExerciseDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { workouts } = useWorkouts();
+  const { weightUnit } = useSettings();
   const exercise = id ? getExerciseById(id) : undefined;
 
   const sessions = useMemo(() => {
@@ -47,6 +50,16 @@ export default function ExerciseDetailScreen() {
   const allSets = id ? setsForExercise(workouts, id) : [];
   const bestSet = id ? bestSetEver(workouts, id) : null;
   const oneRm = id ? bestOneRepMax(workouts, id) : 0;
+
+  // Sparkline of best e1RM per session (oldest → newest).
+  const e1rmSeries = useMemo(() => {
+    return [...sessions]
+      .reverse()
+      .map((session) =>
+        Math.max(...session.sets.map((s) => estimateOneRepMax(s.weight, s.reps))),
+      )
+      .filter((v) => v > 0);
+  }, [sessions]);
 
   if (!exercise) {
     return (
@@ -88,7 +101,7 @@ export default function ExerciseDetailScreen() {
           <Card style={styles.statsCard}>
             <Stat label="Sessions" value={String(sessions.length)} />
             <Stat label="Total sets" value={String(allSets.length)} />
-            <Stat label="Best e1RM" value={`${oneRm} kg`} />
+            <Stat label="Best e1RM" value={`${fromKg(oneRm, weightUnit)} ${weightUnit}`} />
           </Card>
 
           <Card style={styles.bestCard}>
@@ -96,7 +109,7 @@ export default function ExerciseDetailScreen() {
               HEAVIEST SET
             </ThemedText>
             <ThemedText type="h2" style={styles.bestText}>
-              {bestSet ? `${bestSet.weight} kg × ${bestSet.reps}` : 'No data yet'}
+              {bestSet ? `${fromKg(bestSet.weight, weightUnit)} ${weightUnit} × ${bestSet.reps}` : 'No data yet'}
             </ThemedText>
             {bestSet ? (
               <ThemedText type="caption" style={styles.meta}>
@@ -104,6 +117,15 @@ export default function ExerciseDetailScreen() {
               </ThemedText>
             ) : null}
           </Card>
+
+          {e1rmSeries.length > 1 ? (
+            <Card style={styles.bestCard}>
+              <ThemedText type="caption" style={styles.cardLabel}>
+                E1RM TREND
+              </ThemedText>
+              <Sparkline values={e1rmSeries.map((v) => fromKg(v, weightUnit))} width={300} height={64} />
+            </Card>
+          ) : null}
 
           <ThemedText type="caption" style={styles.sectionLabel}>
             HISTORY
@@ -128,7 +150,7 @@ export default function ExerciseDetailScreen() {
                       {new Date(session.startedAt).toLocaleDateString()}
                     </ThemedText>
                     <ThemedText type="caption" style={styles.sessionVolume}>
-                      e1RM {Math.max(...session.sets.map((s) => estimateOneRepMax(s.weight, s.reps)))} kg
+                      e1RM {fromKg(Math.max(...session.sets.map((s) => estimateOneRepMax(s.weight, s.reps))), weightUnit)} {weightUnit}
                     </ThemedText>
                   </View>
                   {session.sets.map((set, idx) => (
@@ -137,7 +159,7 @@ export default function ExerciseDetailScreen() {
                         Set {idx + 1}
                       </ThemedText>
                       <ThemedText type="body" style={styles.sessionSetText}>
-                        {set.weight} kg × {set.reps}
+                        {fromKg(set.weight, weightUnit)} {weightUnit} × {set.reps}
                       </ThemedText>
                     </View>
                   ))}

@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
+import { fromKg, useSettings } from '@/contexts/SettingsContext';
 import { useWorkouts } from '@/contexts/WorkoutContext';
 import { getExerciseById } from '@/data/exercises';
 import { computeWorkoutVolumeKg, formatDuration, totalSets } from '@/utils/workoutStats';
@@ -18,6 +19,7 @@ const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 export default function HistoryScreen() {
   const router = useRouter();
   const { workouts } = useWorkouts();
+  const { weightUnit } = useSettings();
 
   const weekActivity = useMemo(() => {
     const now = new Date();
@@ -121,7 +123,7 @@ export default function HistoryScreen() {
                         </View>
                         <View style={styles.workoutStats}>
                           <Stat label="Time" value={formatDuration(workout.durationSeconds)} />
-                          <Stat label="Volume" value={`${Math.round(computeWorkoutVolumeKg(workout))} kg`} />
+                          <Stat label="Volume" value={`${Math.round(fromKg(computeWorkoutVolumeKg(workout), weightUnit))} ${weightUnit}`} />
                           <Stat label="Sets" value={String(totalSets(workout))} />
                         </View>
                         <ThemedText type="caption" style={styles.workoutPreview} numberOfLines={2}>

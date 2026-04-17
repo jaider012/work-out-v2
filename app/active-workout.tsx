@@ -22,6 +22,7 @@ import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
 import { DEFAULT_REST_SECONDS, useWorkouts } from '@/contexts/WorkoutContext';
 import { useRestTimer } from '@/contexts/RestTimerContext';
+import { fromKg, toKg, useSettings } from '@/contexts/SettingsContext';
 import { getExerciseById } from '@/data/exercises';
 import { previousSession, estimateOneRepMax, bestOneRepMax } from '@/utils/exerciseHistory';
 import { computeWorkoutVolumeKg, totalSets } from '@/utils/workoutStats';
@@ -41,9 +42,12 @@ export default function ActiveWorkoutScreen() {
     removeSet,
     updateActiveWorkout,
     setExerciseRest,
+    setExerciseNotes,
+    moveExercise,
     saveActiveAsRoutine,
   } = useWorkouts();
   const restTimer = useRestTimer();
+  const { weightUnit } = useSettings();
 
   const [, force] = useState(0);
   const [restSheetFor, setRestSheetFor] = useState<string | null>(null);
@@ -201,7 +205,7 @@ export default function ActiveWorkoutScreen() {
               VOLUME
             </ThemedText>
             <ThemedText type="body" style={styles.statValue}>
-              {Math.round(volume)} kg
+              {Math.round(fromKg(volume, weightUnit))} {weightUnit}
             </ThemedText>
           </View>
           <View style={styles.statBlock}>
@@ -236,11 +240,13 @@ export default function ActiveWorkoutScreen() {
             placeholderTextColor={Colors.neutral.textTertiary}
           />
 
-          {activeWorkout.exercises.map((workoutExercise) => {
+          {activeWorkout.exercises.map((workoutExercise, exerciseIndex) => {
             const exercise = getExerciseById(workoutExercise.exerciseId);
             const previous = previousSession(workouts, workoutExercise.exerciseId);
             const previousBest1Rm = bestOneRepMax(workouts, workoutExercise.exerciseId);
             const restSeconds = workoutExercise.restSeconds ?? DEFAULT_REST_SECONDS;
+            const isFirst = exerciseIndex === 0;
+            const isLast = exerciseIndex === activeWorkout.exercises.length - 1;
             return (
               <View key={workoutExercise.id} style={styles.exerciseBlock}>
                 <View style={styles.exerciseHeader}>
@@ -271,8 +277,19 @@ export default function ActiveWorkoutScreen() {
                   </Pressable>
                   <TouchableOpacity
                     onPress={() =>
-                      Alert.alert('Remove exercise?', exercise?.name ?? 'Exercise', [
+                      Alert.alert(exercise?.name ?? 'Exercise', undefined, [
                         { text: 'Cancel', style: 'cancel' },
+                        {
+                          text: isFirst ? 'Move down' : 'Move up',
+                          onPress: () =>
+                            moveExercise(workoutExercise.id, isFirst ? 'down' : 'up'),
+                        },
+                        ...(isLast
+                          ? []
+                          : [{
+                              text: 'Move down',
+                              onPress: () => moveExercise(workoutExercise.id, 'down'),
+                            }]),
                         {
                           text: 'Remove',
                           style: 'destructive',
@@ -282,10 +299,21 @@ export default function ActiveWorkoutScreen() {
                     }
                     activeOpacity={0.7}
                     style={{ marginLeft: Spacing.sm }}
+                    testID={`exercise-actions-${workoutExercise.id}`}
                   >
                     <IconSymbol name="ellipsis" size={22} color={Colors.neutral.textSecondary} />
                   </TouchableOpacity>
                 </View>
+
+                <TextInput
+                  testID={`exercise-notes-${workoutExercise.id}`}
+                  value={workoutExercise.notes ?? ''}
+                  onChangeText={(text) => setExerciseNotes(workoutExercise.id, text)}
+                  placeholder="Add notes…"
+                  placeholderTextColor={Colors.neutral.textTertiary}
+                  style={styles.notesInput}
+                  multiline
+                />
 
                 <View style={styles.setHeaderRow}>
                   <ThemedText type="caption" style={[styles.setHeader, { flex: 0.6 }]}>
@@ -295,7 +323,7 @@ export default function ActiveWorkoutScreen() {
                     PREVIOUS
                   </ThemedText>
                   <ThemedText type="caption" style={[styles.setHeader, { flex: 1.1 }]}>
-                    KG
+                    {weightUnit.toUpperCase()}
                   </ThemedText>
                   <ThemedText type="caption" style={[styles.setHeader, { flex: 0.9 }]}>
                     REPS
@@ -332,18 +360,19 @@ export default function ActiveWorkoutScreen() {
                         ) : null}
                       </View>
                       <ThemedText type="caption" style={[styles.previousText, { flex: 1.4 }]}>
-                        {prev ? `${prev.weight} kg × ${prev.reps}` : '—'}
+                        {prev ? `${fromKg(prev.weight, weightUnit)} ${weightUnit} × ${prev.reps}` : '—'}
                       </ThemedText>
                       <TextInput
                         testID={`set-weight-${workoutExercise.id}-${index}`}
-                        value={set.weight ? String(set.weight) : ''}
-                        onChangeText={(text) =>
+                        value={set.weight ? String(fromKg(set.weight, weightUnit)) : ''}
+                        onChangeText={(text) => {
+                          const parsed = parseFloat(text.replace(',', '.')) || 0;
                           updateSet(workoutExercise.id, set.id, {
-                            weight: parseFloat(text.replace(',', '.')) || 0,
-                          })
-                        }
+                            weight: toKg(parsed, weightUnit),
+                          });
+                        }}
                         keyboardType="decimal-pad"
-                        placeholder={prev ? String(prev.weight) : '0'}
+                        placeholder={prev ? String(fromKg(prev.weight, weightUnit)) : '0'}
                         placeholderTextColor={Colors.neutral.textTertiary}
                         style={[styles.setInput, { flex: 1.1 }]}
                       />
@@ -566,6 +595,15 @@ const styles = StyleSheet.create({
   exerciseHeader: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: Spacing.sm },
   exerciseName: { color: Colors.primary.accentViolet },
   exerciseMeta: { color: Colors.neutral.textSecondary, marginTop: 2 },
+  notesInput: {
+    color: Colors.neutral.textPrimary,
+    backgroundColor: Colors.neutral.elevatedBackground,
+    borderRadius: 8,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    marginBottom: Spacing.sm,
+    minHeight: 36,
+  },
   restPill: {
     flexDirection: 'row',
     alignItems: 'center',

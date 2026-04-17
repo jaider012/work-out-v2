@@ -45,6 +45,8 @@ type WorkoutContextValue = {
   updateSet: (workoutExerciseId: string, setId: string, patch: Partial<WorkoutSet>) => void;
   removeSet: (workoutExerciseId: string, setId: string) => void;
   setExerciseRest: (workoutExerciseId: string, restSeconds: number | undefined) => void;
+  setExerciseNotes: (workoutExerciseId: string, notes: string) => void;
+  moveExercise: (workoutExerciseId: string, direction: 'up' | 'down') => void;
   saveActiveAsRoutine: (name: string, folderId?: string) => Promise<Routine | null>;
 
   // routines
@@ -292,6 +294,35 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  const setExerciseNotes = useCallback((workoutExerciseId: string, notes: string) => {
+    setActiveWorkout((current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        exercises: current.exercises.map((ex) =>
+          ex.id === workoutExerciseId ? { ...ex, notes } : ex,
+        ),
+      };
+    });
+  }, []);
+
+  const moveExercise = useCallback(
+    (workoutExerciseId: string, direction: 'up' | 'down') => {
+      setActiveWorkout((current) => {
+        if (!current) return current;
+        const idx = current.exercises.findIndex((ex) => ex.id === workoutExerciseId);
+        if (idx === -1) return current;
+        const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+        if (targetIdx < 0 || targetIdx >= current.exercises.length) return current;
+        const next = [...current.exercises];
+        const [item] = next.splice(idx, 1);
+        next.splice(targetIdx, 0, item);
+        return { ...current, exercises: next };
+      });
+    },
+    [],
+  );
+
   const saveActiveAsRoutine = useCallback(
     async (name: string, folderId?: string) => {
       if (!activeWorkout) return null;
@@ -375,6 +406,8 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       updateSet,
       removeSet,
       setExerciseRest,
+      setExerciseNotes,
+      moveExercise,
       saveActiveAsRoutine,
       saveRoutine,
       deleteRoutine,
@@ -399,6 +432,8 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       updateSet,
       removeSet,
       setExerciseRest,
+      setExerciseNotes,
+      moveExercise,
       saveActiveAsRoutine,
       saveRoutine,
       deleteRoutine,

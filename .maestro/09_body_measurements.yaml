@@ -1,0 +1,24 @@
+# Log a body weight measurement and confirm it shows up on the Profile.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+- tapOn:
+    text: "Profile"
+- tapOn:
+    text: "Body Measurements"
+- assertVisible:
+    id: "measurements-input"
+- tapOn:
+    id: "measurements-input"
+- inputText: "80"
+- hideKeyboard
+- tapOn:
+    id: "measurements-save"
+- assertVisible: "CURRENT"
+- tapOn:
+    id: "chevron.down"
+    optional: true
+
+- tapOn:
+    text: "Profile"
+- assertVisible: "BODY WEIGHT"

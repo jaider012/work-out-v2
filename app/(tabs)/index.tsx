@@ -11,6 +11,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
 import { useAuth } from '@/contexts/AuthContext';
+import { fromKg, useSettings } from '@/contexts/SettingsContext';
 import { useWorkouts } from '@/contexts/WorkoutContext';
 import { getExerciseById } from '@/data/exercises';
 import { computeWorkoutVolumeKg } from '@/utils/workoutStats';
@@ -19,6 +20,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { workouts, activeWorkout, startEmptyWorkout } = useWorkouts();
+  const { weightUnit } = useSettings();
 
   const recent = useMemo(() => workouts.slice(0, 5), [workouts]);
 
@@ -120,7 +122,7 @@ export default function HomeScreen() {
                   </ThemedText>
                   <View style={styles.feedStats}>
                     <Stat label="Time" value={formatDuration(workout.durationSeconds ?? 0)} />
-                    <Stat label="Volume" value={`${Math.round(computeWorkoutVolumeKg(workout))} kg`} />
+                    <Stat label="Volume" value={`${Math.round(fromKg(computeWorkoutVolumeKg(workout), weightUnit))} ${weightUnit}`} />
                     <Stat label="Sets" value={String(totalSets(workout))} />
                   </View>
                   <View style={styles.feedExerciseList}>
@@ -134,7 +136,7 @@ export default function HomeScreen() {
                           </ThemedText>
                           {best ? (
                             <ThemedText type="caption" style={styles.feedExerciseBest}>
-                              {best.weight} kg × {best.reps}
+                              {fromKg(best.weight, weightUnit)} {weightUnit} × {best.reps}
                             </ThemedText>
                           ) : null}
                         </View>

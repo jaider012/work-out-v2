@@ -34,6 +34,8 @@ Android emulator, or physical device.
 | `05_create_routine.yaml` | Workout tab → New Routine → add 2 exercises → Save. |
 | `06_rest_timer_and_pr.yaml` | Heavy single → rest timer overlay → finish triggers PR alert. |
 | `07_exercise_detail.yaml` | Profile → Browse exercises → open Bench Press detail. |
+| `08_settings_unit_toggle.yaml` | Toggle weight unit between KG and LBS in Settings. |
+| `09_body_measurements.yaml` | Log a body weight entry and confirm it surfaces on Profile. |
 
 Run them all in order:
 

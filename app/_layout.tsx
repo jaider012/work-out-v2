@@ -9,7 +9,9 @@ import 'react-native-reanimated';
 import { Colors } from '@/constants/Colors';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ExercisePickerBusProvider } from '@/contexts/ExercisePickerBus';
+import { MeasurementsProvider } from '@/contexts/MeasurementsContext';
 import { RestTimerProvider } from '@/contexts/RestTimerContext';
+import { SettingsProvider } from '@/contexts/SettingsContext';
 import { WorkoutProvider } from '@/contexts/WorkoutContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -68,6 +70,14 @@ function RootLayoutNav() {
           name="exercise/[id]"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="measurements"
+          options={{ presentation: 'modal', headerShown: false }}
+        />
+        <Stack.Screen
+          name="settings"
+          options={{ presentation: 'modal', headerShown: false }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />
@@ -86,13 +96,17 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <WorkoutProvider>
-        <RestTimerProvider>
-          <ExercisePickerBusProvider>
-            <RootLayoutNav />
-          </ExercisePickerBusProvider>
-        </RestTimerProvider>
-      </WorkoutProvider>
+      <SettingsProvider>
+        <WorkoutProvider>
+          <MeasurementsProvider>
+            <RestTimerProvider>
+              <ExercisePickerBusProvider>
+                <RootLayoutNav />
+              </ExercisePickerBusProvider>
+            </RestTimerProvider>
+          </MeasurementsProvider>
+        </WorkoutProvider>
+      </SettingsProvider>
     </AuthProvider>
   );
 }

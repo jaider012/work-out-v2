@@ -139,7 +139,21 @@ yarn e2e:flow .maestro/02_quick_start_workout.yaml
 APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 ```
 
-## 5. Hevy-parity features now implemented
+## 5. Hevy-parity features — iteration 3 update
+
+- ✅ Weight unit preference (kg / lbs) stored in `SettingsContext`, applied to
+  every screen that shows volume / weight (home feed, history, profile,
+  active workout, exercise detail, workout detail, measurements).
+- ✅ Body measurements screen (`/measurements`) with body-weight logging,
+  history list + removal, and a lightweight sparkline trend.
+- ✅ E1RM trend sparkline on the exercise detail page.
+- ✅ Per-exercise notes input in the active workout, plus exercise reorder
+  (chevron up/down + "…" menu) in both the active workout and the routine
+  editor.
+- ✅ Settings modal at `/settings` (weight unit toggle + about).
+- ✅ Profile cards now deep-link to Body Measurements and App Settings.
+
+## 6. Hevy-parity features — earlier iterations
 
 - ✅ Routine editor (create / edit / delete, folder picker, ad-hoc folder
   creation) reachable from the Workout tab and via long-press on a routine.

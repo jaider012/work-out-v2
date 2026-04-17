@@ -85,3 +85,13 @@ export interface WorkoutSummary {
   totalReps: number;
   prCount: number;
 }
+
+export interface BodyMeasurement {
+  id: string;
+  /** ISO date when the measurement was taken. */
+  loggedAt: string;
+  /** Body weight in kg (canonical storage). */
+  weightKg: number;
+  notes?: string;
+}
+

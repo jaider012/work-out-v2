@@ -15,3 +15,5 @@ executionOrder:
     - 05_create_routine.yaml
     - 06_rest_timer_and_pr.yaml
     - 07_exercise_detail.yaml
+    - 08_settings_unit_toggle.yaml
+    - 09_body_measurements.yaml

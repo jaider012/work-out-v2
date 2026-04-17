@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
+import { fromKg, useSettings } from '@/contexts/SettingsContext';
 import { useWorkouts } from '@/contexts/WorkoutContext';
 import { getExerciseById } from '@/data/exercises';
 import { computeWorkoutVolumeKg, formatDuration, totalSets } from '@/utils/workoutStats';
@@ -17,6 +18,7 @@ export default function WorkoutDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { workouts } = useWorkouts();
+  const { weightUnit } = useSettings();
 
   const workout = useMemo(() => workouts.find((w) => w.id === id), [workouts, id]);
 
@@ -59,7 +61,7 @@ export default function WorkoutDetailScreen() {
 
           <Card style={styles.statsCard}>
             <Stat label="Time" value={formatDuration(workout.durationSeconds)} />
-            <Stat label="Volume" value={`${Math.round(computeWorkoutVolumeKg(workout))} kg`} />
+            <Stat label="Volume" value={`${Math.round(fromKg(computeWorkoutVolumeKg(workout), weightUnit))} ${weightUnit}`} />
             <Stat label="Sets" value={String(totalSets(workout))} />
           </Card>
 
@@ -76,7 +78,7 @@ export default function WorkoutDetailScreen() {
                       Set {idx + 1}
                     </ThemedText>
                     <ThemedText type="body" style={styles.setText}>
-                      {set.weight} kg × {set.reps}
+                      {fromKg(set.weight, weightUnit)} {weightUnit} × {set.reps}
                     </ThemedText>
                   </View>
                 ))}

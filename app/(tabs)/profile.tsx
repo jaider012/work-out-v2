@@ -10,6 +10,8 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMeasurements } from '@/contexts/MeasurementsContext';
+import { fromKg, formatWeight, useSettings } from '@/contexts/SettingsContext';
 import { useWorkouts } from '@/contexts/WorkoutContext';
 import { EXERCISES, MUSCLE_LABELS } from '@/data/exercises';
 import { bestOneRepMax } from '@/utils/exerciseHistory';
@@ -24,6 +26,8 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { workouts, personalRecords } = useWorkouts();
+  const { measurements } = useMeasurements();
+  const { weightUnit } = useSettings();
   const [exercisesSheetOpen, setExercisesSheetOpen] = useState(false);
   const [exerciseSearch, setExerciseSearch] = useState('');
 
@@ -143,7 +147,7 @@ export default function ProfileScreen() {
                       />
                     </View>
                     <ThemedText type="caption" style={styles.muscleVolume}>
-                      {Math.round(entry.volume)} kg
+                      {Math.round(fromKg(entry.volume, weightUnit))} {weightUnit}
                     </ThemedText>
                   </View>
                 ))}
@@ -179,7 +183,7 @@ export default function ProfileScreen() {
                           {exercise?.name ?? entry.id}
                         </ThemedText>
                         <ThemedText type="caption" style={styles.muted}>
-                          {Math.round(entry.volume)} kg total · e1RM {entry.oneRm} kg
+                          {Math.round(fromKg(entry.volume, weightUnit))} {weightUnit} total · e1RM {fromKg(entry.oneRm, weightUnit)} {weightUnit}
                         </ThemedText>
                       </View>
                       <IconSymbol name="chevron.right" size={18} color={Colors.neutral.textTertiary} />
@@ -202,11 +206,39 @@ export default function ProfileScreen() {
             )}
           </Section>
 
+          {measurements[0] ? (
+            <Section title="BODY WEIGHT">
+              <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/measurements')}>
+                <Card>
+                  <View style={styles.toggleRow}>
+                    <View>
+                      <ThemedText type="caption" style={styles.muted}>
+                        CURRENT
+                      </ThemedText>
+                      <ThemedText type="h2" style={styles.weight}>
+                        {formatWeight(measurements[0].weightKg, weightUnit)}
+                      </ThemedText>
+                    </View>
+                    <IconSymbol name="chevron.right" size={18} color={Colors.neutral.textTertiary} />
+                  </View>
+                </Card>
+              </TouchableOpacity>
+            </Section>
+          ) : null}
+
           <Section title="ACCOUNT">
             <Card style={styles.menuCard}>
-              <Row icon="person.crop.circle" label="Edit Profile" onPress={() => {}} />
+              <Row
+                icon="person.crop.circle"
+                label="Body Measurements"
+                onPress={() => router.push('/measurements')}
+              />
               <Row icon="bell.fill" label="Notifications" onPress={() => {}} />
-              <Row icon="gearshape.fill" label="App Settings" onPress={() => {}} />
+              <Row
+                icon="gearshape.fill"
+                label="App Settings"
+                onPress={() => router.push('/settings')}
+              />
             </Card>
           </Section>
 
@@ -421,4 +453,6 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   modalSearchInput: { flex: 1, color: Colors.neutral.textPrimary, paddingVertical: Spacing.sm },
+  toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  weight: { color: Colors.neutral.textPrimary, marginTop: Spacing.xs },
 });
