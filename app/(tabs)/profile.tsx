@@ -254,6 +254,11 @@ export default function ProfileScreen() {
           <Section title="ACCOUNT">
             <Card style={styles.menuCard}>
               <Row
+                icon="flag.fill"
+                label="Personal Records"
+                onPress={() => router.push('/personal-records')}
+              />
+              <Row
                 icon="person.crop.circle"
                 label="Body Measurements"
                 onPress={() => router.push('/measurements')}
@@ -385,7 +390,15 @@ function Row({
   destructive,
   onPress,
 }: {
-  icon: 'person.crop.circle' | 'bell.fill' | 'gearshape.fill' | 'questionmark.circle' | 'star.fill' | 'note.text' | 'arrow.right';
+  icon:
+    | 'person.crop.circle'
+    | 'bell.fill'
+    | 'gearshape.fill'
+    | 'questionmark.circle'
+    | 'star.fill'
+    | 'note.text'
+    | 'arrow.right'
+    | 'flag.fill';
   label: string;
   destructive?: boolean;
   onPress: () => void;

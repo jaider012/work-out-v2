@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PlateCalculatorSheet } from '@/components/PlateCalculatorSheet';
 import { RestTimerOverlay } from '@/components/RestTimerOverlay';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -85,6 +86,7 @@ export default function ActiveWorkoutScreen() {
     setExerciseRest,
     setExerciseNotes,
     moveExercise,
+    toggleSuperset,
     saveActiveAsRoutine,
   } = useWorkouts();
   const restTimer = useRestTimer();
@@ -94,6 +96,7 @@ export default function ActiveWorkoutScreen() {
   const [restSheetFor, setRestSheetFor] = useState<string | null>(null);
   const [saveSheetOpen, setSaveSheetOpen] = useState(false);
   const [saveRoutineName, setSaveRoutineName] = useState('');
+  const [plateTargetKg, setPlateTargetKg] = useState<number | null>(null);
 
   useEffect(() => {
     const id = setInterval(() => force((n) => n + 1), 1000);
@@ -315,15 +318,36 @@ export default function ActiveWorkoutScreen() {
             style={styles.workoutNotesInput}
           />
 
-          {activeWorkout.exercises.map((workoutExercise, exerciseIndex) => {
+          {(() => {
+            // Assign superset letters once based on insertion order.
+            const supersetLetters = new Map<string, string>();
+            const letters = 'ABCDEFGHIJ';
+            let nextLetter = 0;
+            for (const ex of activeWorkout.exercises) {
+              if (!ex.supersetId) continue;
+              if (!supersetLetters.has(ex.supersetId)) {
+                supersetLetters.set(ex.supersetId, letters[nextLetter % letters.length]);
+                nextLetter += 1;
+              }
+            }
+            return activeWorkout.exercises.map((workoutExercise, exerciseIndex) => {
             const exercise = getExerciseById(workoutExercise.exerciseId);
             const previous = previousSession(workouts, workoutExercise.exerciseId);
             const previousBest1Rm = bestOneRepMax(workouts, workoutExercise.exerciseId);
             const restSeconds = workoutExercise.restSeconds ?? DEFAULT_REST_SECONDS;
             const isFirst = exerciseIndex === 0;
             const isLast = exerciseIndex === activeWorkout.exercises.length - 1;
+            const supersetLetter = workoutExercise.supersetId
+              ? supersetLetters.get(workoutExercise.supersetId)
+              : null;
             return (
-              <View key={workoutExercise.id} style={styles.exerciseBlock}>
+              <View
+                key={workoutExercise.id}
+                style={[
+                  styles.exerciseBlock,
+                  supersetLetter && styles.exerciseBlockSuperset,
+                ]}
+              >
                 <View style={styles.exerciseHeader}>
                   <Pressable
                     style={{ flex: 1 }}
@@ -331,9 +355,18 @@ export default function ActiveWorkoutScreen() {
                       exercise ? router.push(`/exercise/${exercise.id}`) : null
                     }
                   >
-                    <ThemedText type="h2" style={styles.exerciseName}>
-                      {exercise?.name ?? 'Exercise'}
-                    </ThemedText>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.xs }}>
+                      {supersetLetter ? (
+                        <View style={styles.supersetBadge}>
+                          <ThemedText type="caption" style={styles.supersetBadgeText}>
+                            {supersetLetter}
+                          </ThemedText>
+                        </View>
+                      ) : null}
+                      <ThemedText type="h2" style={styles.exerciseName}>
+                        {exercise?.name ?? 'Exercise'}
+                      </ThemedText>
+                    </View>
                     {exercise ? (
                       <ThemedText type="caption" style={styles.exerciseMeta}>
                         {exercise.primaryMuscle} · {exercise.equipment}
@@ -350,6 +383,25 @@ export default function ActiveWorkoutScreen() {
                       {formatRest(restSeconds)}
                     </ThemedText>
                   </Pressable>
+                  {exercise?.equipment === 'barbell' ? (
+                    <Pressable
+                      onPress={() => {
+                        const heaviest = workoutExercise.sets.reduce(
+                          (max, set) => (set.weight > max ? set.weight : max),
+                          0,
+                        );
+                        setPlateTargetKg(heaviest || workoutExercise.sets[0]?.weight || 0);
+                      }}
+                      hitSlop={8}
+                      style={[styles.restPill, { marginLeft: Spacing.xs }]}
+                      testID={`plate-calc-${workoutExercise.id}`}
+                    >
+                      <IconSymbol name="dumbbell" size={14} color={Colors.neutral.textPrimary} />
+                      <ThemedText type="caption" style={styles.restPillText}>
+                        Plates
+                      </ThemedText>
+                    </Pressable>
+                  ) : null}
                   <TouchableOpacity
                     onPress={() =>
                       Alert.alert(exercise?.name ?? 'Exercise', undefined, [
@@ -365,6 +417,23 @@ export default function ActiveWorkoutScreen() {
                               text: 'Move down',
                               onPress: () => moveExercise(workoutExercise.id, 'down'),
                             }]),
+                        {
+                          text: workoutExercise.supersetId
+                            ? 'Break superset'
+                            : isFirst
+                              ? 'Create superset below'
+                              : 'Create superset with above',
+                          onPress: () => {
+                            if (workoutExercise.supersetId || !isFirst) {
+                              toggleSuperset(workoutExercise.id);
+                            } else {
+                              // First exercise can only start a superset with
+                              // the one directly below it.
+                              const below = activeWorkout.exercises[1];
+                              if (below) toggleSuperset(below.id);
+                            }
+                          },
+                        },
                         {
                           text: 'Remove',
                           style: 'destructive',
@@ -532,7 +601,8 @@ export default function ActiveWorkoutScreen() {
                 </TouchableOpacity>
               </View>
             );
-          })}
+          });
+          })()}
 
           <Button
             testID="active-workout-add-exercise"
@@ -557,6 +627,12 @@ export default function ActiveWorkoutScreen() {
       </SafeAreaView>
 
       <RestTimerOverlay />
+
+      <PlateCalculatorSheet
+        visible={plateTargetKg !== null}
+        targetKg={plateTargetKg ?? 0}
+        onClose={() => setPlateTargetKg(null)}
+      />
 
       {/* Rest seconds picker */}
       <Modal
@@ -705,6 +781,19 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   exerciseHeader: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: Spacing.sm },
+  exerciseBlockSuperset: {
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary.accentViolet,
+  },
+  supersetBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: Colors.primary.accentViolet,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  supersetBadgeText: { color: '#fff', fontWeight: '800' },
   exerciseName: { color: Colors.primary.accentViolet },
   exerciseMeta: { color: Colors.neutral.textSecondary, marginTop: 2 },
   notesInput: {

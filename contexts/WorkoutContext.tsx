@@ -48,6 +48,7 @@ type WorkoutContextValue = {
   setExerciseRest: (workoutExerciseId: string, restSeconds: number | undefined) => void;
   setExerciseNotes: (workoutExerciseId: string, notes: string) => void;
   moveExercise: (workoutExerciseId: string, direction: 'up' | 'down') => void;
+  toggleSuperset: (workoutExerciseId: string) => void;
   saveActiveAsRoutine: (name: string, folderId?: string) => Promise<Routine | null>;
 
   // routines
@@ -335,6 +336,44 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const toggleSuperset = useCallback((workoutExerciseId: string) => {
+    setActiveWorkout((current) => {
+      if (!current) return current;
+      const idx = current.exercises.findIndex((ex) => ex.id === workoutExerciseId);
+      if (idx === -1) return current;
+      const target = current.exercises[idx];
+      // If already in a superset, pull it out.
+      if (target.supersetId) {
+        const siblings = current.exercises.filter(
+          (ex) => ex.supersetId === target.supersetId && ex.id !== target.id,
+        );
+        // If the superset would collapse to a single exercise, clear it too.
+        const clearedSiblingId = siblings.length === 1 ? siblings[0].id : null;
+        return {
+          ...current,
+          exercises: current.exercises.map((ex) => {
+            if (ex.id === target.id) return { ...ex, supersetId: undefined };
+            if (ex.id === clearedSiblingId) return { ...ex, supersetId: undefined };
+            return ex;
+          }),
+        };
+      }
+      // Otherwise merge with the exercise above if there is one.
+      if (idx === 0) return current;
+      const partner = current.exercises[idx - 1];
+      const supersetId = partner.supersetId ?? newId('superset');
+      return {
+        ...current,
+        exercises: current.exercises.map((ex) => {
+          if (ex.id === target.id || ex.id === partner.id) {
+            return { ...ex, supersetId };
+          }
+          return ex;
+        }),
+      };
+    });
+  }, []);
+
   const moveExercise = useCallback(
     (workoutExerciseId: string, direction: 'up' | 'down') => {
       setActiveWorkout((current) => {
@@ -455,6 +494,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       setExerciseRest,
       setExerciseNotes,
       moveExercise,
+      toggleSuperset,
       saveActiveAsRoutine,
       saveRoutine,
       deleteRoutine,
@@ -486,6 +526,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       setExerciseRest,
       setExerciseNotes,
       moveExercise,
+      toggleSuperset,
       saveActiveAsRoutine,
       saveRoutine,
       deleteRoutine,

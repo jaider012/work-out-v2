@@ -50,6 +50,12 @@ export interface WorkoutExercise {
   notes?: string;
   /** Rest timer in seconds. */
   restSeconds?: number;
+  /**
+   * Exercises that share the same `supersetId` form a superset group and are
+   * rendered with a common letter label (A, B, C…). Undefined means a plain
+   * solo exercise.
+   */
+  supersetId?: string;
 }
 
 export interface Workout {

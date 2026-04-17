@@ -78,6 +78,10 @@ function RootLayoutNav() {
           name="settings"
           options={{ presentation: 'modal', headerShown: false }}
         />
+        <Stack.Screen
+          name="personal-records"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />

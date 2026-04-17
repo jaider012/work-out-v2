@@ -39,6 +39,7 @@ Android emulator, or physical device.
 | `10_set_types_and_calendar.yaml` | Cycle the set type badge and navigate the history calendar. |
 | `11_banner_and_repeat.yaml` | Persistent banner, Discover copy + equipment filter smoke test. |
 | `12_notes_rpe_and_import.yaml` | Workout notes input, RPE cycling and Settings import button. |
+| `13_supersets_and_plates.yaml` | Superset creation menu, plate calculator sheet, PR list screen. |
 
 Run them all in order:
 
