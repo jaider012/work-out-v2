@@ -21,3 +21,4 @@ executionOrder:
     - 11_banner_and_repeat.yaml
     - 12_notes_rpe_and_import.yaml
     - 13_supersets_and_plates.yaml
+    - 14_steppers_and_clear.yaml

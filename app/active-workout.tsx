@@ -30,6 +30,8 @@ import { computeWorkoutVolumeKg, totalSets } from '@/utils/workoutStats';
 
 const REST_PRESETS = [60, 90, 120, 180, 240];
 const SET_TYPE_ORDER = ['normal', 'warmup', 'failure', 'drop'] as const;
+const WEIGHT_STEP_KG = 2.5;
+const WEIGHT_STEP_LBS = 5;
 type SetType = (typeof SET_TYPE_ORDER)[number];
 
 function nextSetType(type: SetType): SetType {
@@ -520,20 +522,52 @@ export default function ActiveWorkoutScreen() {
                       <ThemedText type="caption" style={[styles.previousText, { flex: 1.2 }]}>
                         {prev ? `${fromKg(prev.weight, weightUnit)} × ${prev.reps}` : '—'}
                       </ThemedText>
-                      <TextInput
-                        testID={`set-weight-${workoutExercise.id}-${index}`}
-                        value={set.weight ? String(fromKg(set.weight, weightUnit)) : ''}
-                        onChangeText={(text) => {
-                          const parsed = parseFloat(text.replace(',', '.')) || 0;
-                          updateSet(workoutExercise.id, set.id, {
-                            weight: toKg(parsed, weightUnit),
-                          });
-                        }}
-                        keyboardType="decimal-pad"
-                        placeholder={prev ? String(fromKg(prev.weight, weightUnit)) : '0'}
-                        placeholderTextColor={Colors.neutral.textTertiary}
-                        style={[styles.setInput, { flex: 1 }]}
-                      />
+                      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', marginRight: Spacing.xs }}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            const step = weightUnit === 'lbs' ? WEIGHT_STEP_LBS : WEIGHT_STEP_KG;
+                            const currentInUnit = fromKg(set.weight, weightUnit);
+                            const next = Math.max(0, currentInUnit - step);
+                            updateSet(workoutExercise.id, set.id, {
+                              weight: toKg(next, weightUnit),
+                            });
+                          }}
+                          hitSlop={6}
+                          style={styles.stepper}
+                          testID={`set-weight-minus-${workoutExercise.id}-${index}`}
+                        >
+                          <IconSymbol name="minus" size={14} color={Colors.neutral.textPrimary} />
+                        </TouchableOpacity>
+                        <TextInput
+                          testID={`set-weight-${workoutExercise.id}-${index}`}
+                          value={set.weight ? String(fromKg(set.weight, weightUnit)) : ''}
+                          onChangeText={(text) => {
+                            const parsed = parseFloat(text.replace(',', '.')) || 0;
+                            updateSet(workoutExercise.id, set.id, {
+                              weight: toKg(parsed, weightUnit),
+                            });
+                          }}
+                          keyboardType="decimal-pad"
+                          placeholder={prev ? String(fromKg(prev.weight, weightUnit)) : '0'}
+                          placeholderTextColor={Colors.neutral.textTertiary}
+                          style={[styles.setInput, { flex: 1, marginRight: 0 }]}
+                        />
+                        <TouchableOpacity
+                          onPress={() => {
+                            const step = weightUnit === 'lbs' ? WEIGHT_STEP_LBS : WEIGHT_STEP_KG;
+                            const currentInUnit = fromKg(set.weight, weightUnit);
+                            const next = currentInUnit + step;
+                            updateSet(workoutExercise.id, set.id, {
+                              weight: toKg(next, weightUnit),
+                            });
+                          }}
+                          hitSlop={6}
+                          style={styles.stepper}
+                          testID={`set-weight-plus-${workoutExercise.id}-${index}`}
+                        >
+                          <IconSymbol name="plus" size={14} color={Colors.neutral.textPrimary} />
+                        </TouchableOpacity>
+                      </View>
                       <TextInput
                         testID={`set-reps-${workoutExercise.id}-${index}`}
                         value={set.reps ? String(set.reps) : ''}
@@ -855,6 +889,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rpeText: { color: Colors.neutral.textPrimary, fontWeight: '600' },
+  stepper: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: Colors.neutral.elevatedBackground,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 2,
+  },
   previousText: { color: Colors.neutral.textTertiary },
   prBadge: {
     color: Colors.semantic.pr,

@@ -21,9 +21,28 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { weightUnit, setWeightUnit } = useSettings();
   const { workouts, routines, folders, importData } = useWorkouts();
-  const { measurements } = useMeasurements();
+  const { measurements, removeMeasurement } = useMeasurements();
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+
+  const handleClearAll = () => {
+    Alert.alert(
+      'Clear all data?',
+      'This will delete every workout, routine, folder and measurement from this device. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete everything',
+          style: 'destructive',
+          onPress: async () => {
+            await importData({ workouts: [], routines: [], folders: [] });
+            await Promise.all(measurements.map((m) => removeMeasurement(m.id)));
+            Alert.alert('Data cleared', 'All local data has been removed.');
+          },
+        },
+      ],
+    );
+  };
 
   const handleImport = async () => {
     setImporting(true);
@@ -158,6 +177,20 @@ export default function SettingsScreen() {
               {workouts.length} workouts · {routines.length} routines · {measurements.length}{' '}
               measurements
             </ThemedText>
+          </Card>
+
+          <ThemedText type="caption" style={styles.sectionLabel}>
+            DANGER ZONE
+          </ThemedText>
+          <Card style={styles.card}>
+            <Button
+              testID="settings-clear-all"
+              title="Clear all data"
+              variant="destructive"
+              fullWidth
+              onPress={handleClearAll}
+              disabled={exporting || importing}
+            />
           </Card>
 
           <ThemedText type="caption" style={styles.sectionLabel}>

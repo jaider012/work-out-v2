@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
 import { fromKg, useSettings } from '@/contexts/SettingsContext';
-import { DEFAULT_BAR_KG, calculatePlates } from '@/utils/plateCalculator';
+import { calculatePlates } from '@/utils/plateCalculator';
 
 interface PlateCalculatorSheetProps {
   visible: boolean;
@@ -15,7 +15,10 @@ interface PlateCalculatorSheetProps {
 
 export function PlateCalculatorSheet({ visible, targetKg, onClose }: PlateCalculatorSheetProps) {
   const { weightUnit } = useSettings();
-  const breakdown = calculatePlates(targetKg);
+  // Compute the breakdown in the user's preferred unit so plate labels stay
+  // in the same system they see on the set rows.
+  const targetInUnit = fromKg(targetKg, weightUnit);
+  const breakdown = calculatePlates(targetInUnit, weightUnit);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -25,7 +28,7 @@ export function PlateCalculatorSheet({ visible, targetKg, onClose }: PlateCalcul
             Plate calculator
           </ThemedText>
           <ThemedText type="caption" style={styles.muted}>
-            Target: {fromKg(targetKg, weightUnit)} {weightUnit} · Bar: {breakdown.barKg} kg
+            Target: {targetInUnit} {weightUnit} · Bar: {breakdown.bar} {weightUnit}
           </ThemedText>
 
           {breakdown.perSide.length === 0 ? (
@@ -38,10 +41,10 @@ export function PlateCalculatorSheet({ visible, targetKg, onClose }: PlateCalcul
                 PER SIDE
               </ThemedText>
               {breakdown.perSide.map((plate) => (
-                <View key={plate.kg} style={styles.plateRow}>
-                  <View style={[styles.plateChip, plateColor(plate.kg)]}>
+                <View key={plate.size} style={styles.plateRow}>
+                  <View style={[styles.plateChip, plateColor(plate.size, weightUnit)]}>
                     <ThemedText type="caption" style={styles.plateChipText}>
-                      {plate.kg}
+                      {plate.size}
                     </ThemedText>
                   </View>
                   <ThemedText type="body" style={styles.bodyText}>
@@ -52,9 +55,9 @@ export function PlateCalculatorSheet({ visible, targetKg, onClose }: PlateCalcul
             </View>
           )}
 
-          {breakdown.remainderKg > 0 ? (
+          {breakdown.remainder > 0 ? (
             <ThemedText type="caption" style={styles.warning}>
-              Could not load {breakdown.remainderKg} kg — grab smaller plates.
+              Could not load {breakdown.remainder} {weightUnit} — grab smaller plates.
             </ThemedText>
           ) : null}
         </View>
@@ -63,8 +66,27 @@ export function PlateCalculatorSheet({ visible, targetKg, onClose }: PlateCalcul
   );
 }
 
-function plateColor(kg: number) {
-  switch (kg) {
+function plateColor(size: number, unit: 'kg' | 'lbs') {
+  if (unit === 'lbs') {
+    switch (size) {
+      case 45:
+        return { backgroundColor: '#1565C0' };
+      case 35:
+        return { backgroundColor: '#F9A825' };
+      case 25:
+        return { backgroundColor: '#2E7D32' };
+      case 10:
+        return { backgroundColor: '#C62828' };
+      case 5:
+        return { backgroundColor: '#6A1B9A' };
+      case 2.5:
+      case 1.25:
+        return { backgroundColor: '#546E7A' };
+      default:
+        return { backgroundColor: Colors.neutral.elevatedBackground };
+    }
+  }
+  switch (size) {
     case 25:
       return { backgroundColor: '#C62828' };
     case 20:
@@ -76,6 +98,7 @@ function plateColor(kg: number) {
     case 5:
       return { backgroundColor: '#6A1B9A' };
     case 2.5:
+    case 1.25:
       return { backgroundColor: '#546E7A' };
     default:
       return { backgroundColor: Colors.neutral.elevatedBackground };
@@ -112,5 +135,3 @@ const styles = StyleSheet.create({
   plateChipText: { color: '#fff', fontWeight: '800' },
   warning: { color: Colors.semantic.warning },
 });
-
-export { DEFAULT_BAR_KG };

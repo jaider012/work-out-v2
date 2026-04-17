@@ -25,6 +25,27 @@ export default function HomeScreen() {
 
   const recent = useMemo(() => workouts.slice(0, 5), [workouts]);
   const streak = useMemo(() => computeStreak(workouts), [workouts]);
+  const weekActivity = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - 6); // last 7 days including today
+    return Array.from({ length: 7 }, (_, idx) => {
+      const day = new Date(start);
+      day.setDate(start.getDate() + idx);
+      const next = new Date(day);
+      next.setDate(day.getDate() + 1);
+      const count = workouts.filter((w) => {
+        const t = new Date(w.startedAt).getTime();
+        return t >= day.getTime() && t < next.getTime();
+      }).length;
+      const isToday =
+        day.getDate() === now.getDate() &&
+        day.getMonth() === now.getMonth() &&
+        day.getFullYear() === now.getFullYear();
+      return { day, count, isToday };
+    });
+  }, [workouts]);
 
   const handleStart = () => {
     if (!activeWorkout) startEmptyWorkout();
@@ -97,6 +118,26 @@ export default function HomeScreen() {
               />
             </Card>
           )}
+
+          <View style={styles.activityStrip}>
+            {weekActivity.map((entry, idx) => (
+              <View key={idx} style={styles.activityCol}>
+                <View
+                  style={[
+                    styles.activityDot,
+                    entry.count > 0 && { backgroundColor: Colors.primary.accentViolet },
+                    entry.isToday && { borderWidth: 1, borderColor: Colors.neutral.textPrimary },
+                  ]}
+                />
+                <ThemedText type="small" style={styles.activityLabel}>
+                  {entry.day
+                    .toLocaleDateString(undefined, { weekday: 'short' })
+                    .slice(0, 1)
+                    .toUpperCase()}
+                </ThemedText>
+              </View>
+            ))}
+          </View>
 
           <View style={styles.section}>
             <ThemedText type="caption" style={styles.sectionTitle}>
@@ -243,6 +284,20 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   streakText: { color: Colors.neutral.textPrimary, fontWeight: '700' },
+  activityStrip: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.lg,
+    paddingHorizontal: Spacing.xs,
+  },
+  activityCol: { alignItems: 'center', gap: Spacing.xs },
+  activityDot: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: Colors.neutral.elevatedBackground,
+  },
+  activityLabel: { color: Colors.neutral.textSecondary },
   startCard: { marginBottom: Spacing.lg },
   startTitle: { color: Colors.neutral.textPrimary, marginBottom: Spacing.xs },
   startSubtitle: { color: Colors.neutral.textSecondary },

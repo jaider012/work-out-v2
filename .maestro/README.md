@@ -40,6 +40,7 @@ Android emulator, or physical device.
 | `11_banner_and_repeat.yaml` | Persistent banner, Discover copy + equipment filter smoke test. |
 | `12_notes_rpe_and_import.yaml` | Workout notes input, RPE cycling and Settings import button. |
 | `13_supersets_and_plates.yaml` | Superset creation menu, plate calculator sheet, PR list screen. |
+| `14_steppers_and_clear.yaml` | Weight steppers, activity strip, Settings → Clear data button. |
 
 Run them all in order:
 
