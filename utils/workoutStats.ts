@@ -10,6 +10,7 @@ export function computeWorkoutVolumeKg(workout: Pick<Workout, 'exercises'>) {
   for (const ex of workout.exercises) {
     for (const set of ex.sets) {
       if (set.completed === false) continue;
+      if (set.type === 'warmup') continue;
       total += setVolumeKg(set);
     }
   }

@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { fromKg, useSettings } from '@/contexts/SettingsContext';
 import { useWorkouts } from '@/contexts/WorkoutContext';
 import { getExerciseById } from '@/data/exercises';
+import { computeStreak } from '@/utils/streak';
 import { computeWorkoutVolumeKg } from '@/utils/workoutStats';
 
 export default function HomeScreen() {
@@ -23,6 +24,7 @@ export default function HomeScreen() {
   const { weightUnit } = useSettings();
 
   const recent = useMemo(() => workouts.slice(0, 5), [workouts]);
+  const streak = useMemo(() => computeStreak(workouts), [workouts]);
 
   const handleStart = () => {
     if (!activeWorkout) startEmptyWorkout();
@@ -36,7 +38,7 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
-            <View>
+            <View style={{ flex: 1 }}>
               <ThemedText type="caption" style={styles.greeting}>
                 Welcome back
               </ThemedText>
@@ -44,6 +46,14 @@ export default function HomeScreen() {
                 {greeting}
               </ThemedText>
             </View>
+            {streak > 0 ? (
+              <View style={styles.streakChip} testID="home-streak">
+                <IconSymbol name="flame.fill" size={16} color={Colors.semantic.warning} />
+                <ThemedText type="caption" style={styles.streakText}>
+                  {streak}d
+                </ThemedText>
+              </View>
+            ) : null}
             <View style={styles.avatar}>
               <IconSymbol name="person.fill" size={24} color={Colors.neutral.textPrimary} />
             </View>
@@ -221,7 +231,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.neutral.cardBackground,
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: Spacing.sm,
   },
+  streakChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.neutral.cardBackground,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+  },
+  streakText: { color: Colors.neutral.textPrimary, fontWeight: '700' },
   startCard: { marginBottom: Spacing.lg },
   startTitle: { color: Colors.neutral.textPrimary, marginBottom: Spacing.xs },
   startSubtitle: { color: Colors.neutral.textSecondary },

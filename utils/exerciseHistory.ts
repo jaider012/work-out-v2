@@ -7,7 +7,7 @@ export interface PerformedSet {
   startedAt: string;
 }
 
-/** All historical sets for a given exercise across past workouts (newest first). */
+/** All historical working sets (excludes warmups) for a given exercise, newest first. */
 export function setsForExercise(workouts: Workout[], exerciseId: string): PerformedSet[] {
   const acc: PerformedSet[] = [];
   for (const workout of workouts) {
@@ -15,6 +15,7 @@ export function setsForExercise(workouts: Workout[], exerciseId: string): Perfor
       if (ex.exerciseId !== exerciseId) continue;
       for (const set of ex.sets) {
         if (set.completed === false) continue;
+        if (set.type === 'warmup') continue;
         acc.push({
           weight: set.weight,
           reps: set.reps,
@@ -74,6 +75,7 @@ export function detectPRs(workout: Workout, history: Workout[]): Set<string> {
     let currentBest = previousBest;
     for (const set of ex.sets) {
       if (!set.completed) continue;
+      if (set.type === 'warmup') continue;
       const oneRm = estimateOneRepMax(set.weight, set.reps);
       if (oneRm > currentBest && oneRm > 0) {
         prs.add(`${ex.id}:${set.id}`);

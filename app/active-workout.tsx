@@ -28,6 +28,39 @@ import { previousSession, estimateOneRepMax, bestOneRepMax } from '@/utils/exerc
 import { computeWorkoutVolumeKg, totalSets } from '@/utils/workoutStats';
 
 const REST_PRESETS = [60, 90, 120, 180, 240];
+const SET_TYPE_ORDER = ['normal', 'warmup', 'failure', 'drop'] as const;
+type SetType = (typeof SET_TYPE_ORDER)[number];
+
+function nextSetType(type: SetType): SetType {
+  const idx = SET_TYPE_ORDER.indexOf(type);
+  return SET_TYPE_ORDER[(idx + 1) % SET_TYPE_ORDER.length];
+}
+
+function setTypeLabel(type: SetType, index: number) {
+  switch (type) {
+    case 'warmup':
+      return 'W';
+    case 'failure':
+      return 'F';
+    case 'drop':
+      return 'D';
+    default:
+      return String(index + 1);
+  }
+}
+
+function setTypeBadgeStyle(type: SetType) {
+  switch (type) {
+    case 'warmup':
+      return { backgroundColor: '#3A4A7A', borderColor: '#7C9CFF' };
+    case 'failure':
+      return { backgroundColor: '#5C2A2A', borderColor: '#FF7070' };
+    case 'drop':
+      return { backgroundColor: '#4A3A7A', borderColor: '#A07CFF' };
+    default:
+      return { backgroundColor: 'transparent', borderColor: 'transparent' };
+  }
+}
 
 export default function ActiveWorkoutScreen() {
   const router = useRouter();
@@ -58,6 +91,20 @@ export default function ActiveWorkoutScreen() {
     const id = setInterval(() => force((n) => n + 1), 1000);
     return () => clearInterval(id);
   }, []);
+
+  const lastWorkoutAgo = useMemo(() => {
+    const last = workouts[0];
+    if (!last) return null;
+    const diffMs = Date.now() - new Date(last.startedAt).getTime();
+    const days = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return `${days}d ago`;
+    const weeks = Math.floor(days / 7);
+    if (weeks < 5) return `${weeks}w ago`;
+    const months = Math.floor(days / 30);
+    return `${months}mo ago`;
+  }, [workouts]);
 
   const completedSets = useMemo(
     () =>
@@ -219,6 +266,14 @@ export default function ActiveWorkoutScreen() {
           <Pressable onPress={() => setSaveSheetOpen(true)} hitSlop={12}>
             <View style={styles.statBlock}>
               <ThemedText type="caption" style={styles.statLabel}>
+                LAST
+              </ThemedText>
+              <ThemedText type="body" style={styles.statValue}>
+                {lastWorkoutAgo ?? '—'}
+              </ThemedText>
+            </View>
+            <View style={styles.statBlock}>
+              <ThemedText type="caption" style={styles.statLabel}>
                 ROUTINE
               </ThemedText>
               <ThemedText type="body" style={[styles.statValue, { color: Colors.primary.accentViolet }]}>
@@ -350,9 +405,20 @@ export default function ActiveWorkoutScreen() {
                       ]}
                     >
                       <View style={{ flex: 0.6, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <ThemedText type="body" style={styles.setIndex}>
-                          {index + 1}
-                        </ThemedText>
+                        <TouchableOpacity
+                          onPress={() =>
+                            updateSet(workoutExercise.id, set.id, {
+                              type: nextSetType(set.type ?? 'normal'),
+                            })
+                          }
+                          hitSlop={6}
+                          style={[styles.setTypeBadge, setTypeBadgeStyle(set.type ?? 'normal')]}
+                          testID={`set-type-${workoutExercise.id}-${index}`}
+                        >
+                          <ThemedText type="caption" style={styles.setTypeBadgeText}>
+                            {setTypeLabel(set.type ?? 'normal', index)}
+                          </ThemedText>
+                        </TouchableOpacity>
                         {isPR ? (
                           <ThemedText type="caption" style={styles.prBadge} testID={`set-pr-${workoutExercise.id}-${index}`}>
                             PR
@@ -634,6 +700,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   setIndex: { color: Colors.neutral.textPrimary, fontWeight: '600' },
+  setTypeBadge: {
+    minWidth: 26,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  setTypeBadgeText: { color: Colors.neutral.textPrimary, fontWeight: '700' },
   previousText: { color: Colors.neutral.textTertiary },
   prBadge: {
     color: Colors.semantic.pr,

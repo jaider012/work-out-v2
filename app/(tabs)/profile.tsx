@@ -15,6 +15,7 @@ import { fromKg, formatWeight, useSettings } from '@/contexts/SettingsContext';
 import { useWorkouts } from '@/contexts/WorkoutContext';
 import { EXERCISES, MUSCLE_LABELS } from '@/data/exercises';
 import { bestOneRepMax } from '@/utils/exerciseHistory';
+import { computeStreak } from '@/utils/streak';
 import {
   computeWorkoutVolumeKg,
   muscleVolumeMap,
@@ -41,6 +42,7 @@ export default function ProfileScreen() {
       totalVolume,
       totalSets: workouts.reduce((sum, w) => sum + totalSets(w), 0),
       personalRecords: personalRecords.length,
+      streak: computeStreak(workouts),
     };
   }, [workouts, lastWeek, personalRecords]);
 
@@ -118,9 +120,11 @@ export default function ProfileScreen() {
           <Card style={styles.statsCard}>
             <View style={styles.statsGrid}>
               <Stat title="Workouts" value={String(stats.workoutsAllTime)} />
+              <Stat title="Streak" value={`${stats.streak}d`} />
               <Stat title="This week" value={String(stats.workoutsThisWeek)} />
               <Stat title="Sets" value={String(stats.totalSets)} />
               <Stat title="PRs" value={String(stats.personalRecords)} />
+              <Stat title="Volume" value={`${Math.round(fromKg(stats.totalVolume, weightUnit) / 1000)}t`} />
             </View>
           </Card>
 

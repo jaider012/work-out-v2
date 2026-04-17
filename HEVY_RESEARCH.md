@@ -139,7 +139,20 @@ yarn e2e:flow .maestro/02_quick_start_workout.yaml
 APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 ```
 
-## 5. Hevy-parity features — iteration 3 update
+## 5. Hevy-parity features — iteration 4 update
+
+- ✅ Per-set type badge (Normal / Warmup / Failure / Drop) – tap to cycle
+  through states, mirrors Hevy's W / F / D markers. Warmups are excluded
+  from volume, PR detection and exercise history.
+- ✅ Workout streak counter (consecutive days with at least one session)
+  surfaced as a flame chip on Home and a stat on Profile.
+- ✅ History tab now renders a full month calendar with violet dots on days
+  that have a workout, today ring, prev/next navigation and day selection
+  that filters the list below.
+- ✅ Active workout header now shows "LAST" — how long ago the last workout
+  was logged — alongside volume and sets.
+
+## 6. Hevy-parity features — iteration 3 update
 
 - ✅ Weight unit preference (kg / lbs) stored in `SettingsContext`, applied to
   every screen that shows volume / weight (home feed, history, profile,
@@ -153,7 +166,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ Settings modal at `/settings` (weight unit toggle + about).
 - ✅ Profile cards now deep-link to Body Measurements and App Settings.
 
-## 6. Hevy-parity features — earlier iterations
+## 7. Hevy-parity features — earlier iterations
 
 - ✅ Routine editor (create / edit / delete, folder picker, ad-hoc folder
   creation) reachable from the Workout tab and via long-press on a routine.

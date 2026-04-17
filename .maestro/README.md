@@ -36,6 +36,7 @@ Android emulator, or physical device.
 | `07_exercise_detail.yaml` | Profile → Browse exercises → open Bench Press detail. |
 | `08_settings_unit_toggle.yaml` | Toggle weight unit between KG and LBS in Settings. |
 | `09_body_measurements.yaml` | Log a body weight entry and confirm it surfaces on Profile. |
+| `10_set_types_and_calendar.yaml` | Cycle the set type badge and navigate the history calendar. |
 
 Run them all in order:
 
