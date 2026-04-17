@@ -139,7 +139,22 @@ yarn e2e:flow .maestro/02_quick_start_workout.yaml
 APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 ```
 
-## 5. Hevy-parity features — iteration 4 update
+## 5. Hevy-parity features — iteration 5 update
+
+- ✅ Persistent **active workout banner** floats above the tab bar on every
+  tab screen. Shows workout name, live elapsed timer and deep-links into the
+  modal (exactly like Hevy's "resume" bar).
+- ✅ **Repeat Workout** button on past workout detail. Clones the exercises
+  (weights reset) and drops the user straight into logging.
+- ✅ Exercise picker now has a second row of **equipment filters**
+  (Any / Barbell / Dumbbell / Machine / Cable / Bodyweight).
+- ✅ **Discover** section on the Workout tab with 6 curated starter routines
+  (PPL, Upper, Lower, Full body) that can be copied into the user's library
+  with one tap.
+- ✅ **JSON export** from Settings (uses `expo-file-system` + `expo-sharing`)
+  to back up workouts, routines, folders and body measurements.
+
+## 6. Hevy-parity features — iteration 4 update
 
 - ✅ Per-set type badge (Normal / Warmup / Failure / Drop) – tap to cycle
   through states, mirrors Hevy's W / F / D markers. Warmups are excluded
@@ -152,7 +167,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ Active workout header now shows "LAST" — how long ago the last workout
   was logged — alongside volume and sets.
 
-## 6. Hevy-parity features — iteration 3 update
+## 7. Hevy-parity features — iteration 3 update
 
 - ✅ Weight unit preference (kg / lbs) stored in `SettingsContext`, applied to
   every screen that shows volume / weight (home feed, history, profile,
@@ -166,7 +181,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ Settings modal at `/settings` (weight unit toggle + about).
 - ✅ Profile cards now deep-link to Body Measurements and App Settings.
 
-## 7. Hevy-parity features — earlier iterations
+## 8. Hevy-parity features — earlier iterations
 
 - ✅ Routine editor (create / edit / delete, folder picker, ad-hoc folder
   creation) reachable from the Workout tab and via long-press on a routine.

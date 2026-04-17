@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
@@ -17,7 +18,7 @@ import { computeWorkoutVolumeKg, formatDuration, totalSets } from '@/utils/worko
 export default function WorkoutDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { workouts } = useWorkouts();
+  const { workouts, activeWorkout, startFromWorkout } = useWorkouts();
   const { weightUnit } = useSettings();
 
   const workout = useMemo(() => workouts.find((w) => w.id === id), [workouts, id]);
@@ -64,6 +65,20 @@ export default function WorkoutDetailScreen() {
             <Stat label="Volume" value={`${Math.round(fromKg(computeWorkoutVolumeKg(workout), weightUnit))} ${weightUnit}`} />
             <Stat label="Sets" value={String(totalSets(workout))} />
           </Card>
+
+          <Button
+            testID="workout-repeat"
+            title={activeWorkout ? 'Workout already in progress' : 'Repeat Workout'}
+            variant="primary"
+            fullWidth
+            onPress={() => {
+              if (activeWorkout) return;
+              startFromWorkout(workout.id);
+              router.push('/active-workout');
+            }}
+            disabled={!!activeWorkout}
+            style={{ marginBottom: Spacing.lg }}
+          />
 
           {workout.exercises.map((ex) => {
             const exercise = getExerciseById(ex.exerciseId);

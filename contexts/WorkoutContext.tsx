@@ -33,6 +33,7 @@ type WorkoutContextValue = {
   // active workout actions
   startEmptyWorkout: () => Workout;
   startRoutine: (routineId: string) => Workout | null;
+  startFromWorkout: (workoutId: string) => Workout | null;
   finishActiveWorkout: () => Promise<{
     workout: Workout;
     newPRs: string[];
@@ -169,6 +170,28 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       return workout;
     },
     [routines],
+  );
+
+  const startFromWorkout = useCallback(
+    (workoutId: string): Workout | null => {
+      const source = workouts.find((w) => w.id === workoutId);
+      if (!source) return null;
+      const workout: Workout = {
+        id: newId('workout'),
+        name: source.name,
+        startedAt: new Date().toISOString(),
+        exercises: source.exercises.map((ex) => ({
+          id: newId('we'),
+          exerciseId: ex.exerciseId,
+          notes: ex.notes,
+          restSeconds: ex.restSeconds,
+          sets: (ex.sets.length ? ex.sets : [null]).map(() => createEmptySet()),
+        })),
+      };
+      setActiveWorkout(workout);
+      return workout;
+    },
+    [workouts],
   );
 
   const finishActiveWorkout = useCallback(async () => {
@@ -397,6 +420,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       personalRecords,
       startEmptyWorkout,
       startRoutine,
+      startFromWorkout,
       finishActiveWorkout,
       discardActiveWorkout,
       updateActiveWorkout,
@@ -423,6 +447,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       personalRecords,
       startEmptyWorkout,
       startRoutine,
+      startFromWorkout,
       finishActiveWorkout,
       discardActiveWorkout,
       updateActiveWorkout,

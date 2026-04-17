@@ -18,7 +18,7 @@ import { Spacing } from '@/constants/Layout';
 import { useExercisePickerBus } from '@/contexts/ExercisePickerBus';
 import { useWorkouts } from '@/contexts/WorkoutContext';
 import { EQUIPMENT_LABELS, EXERCISES, MUSCLE_LABELS } from '@/data/exercises';
-import type { Exercise, MuscleGroup } from '@/types/workout';
+import type { Equipment, Exercise, MuscleGroup } from '@/types/workout';
 
 const MUSCLE_FILTERS: ('all' | MuscleGroup)[] = [
   'all',
@@ -34,6 +34,15 @@ const MUSCLE_FILTERS: ('all' | MuscleGroup)[] = [
   'cardio',
 ];
 
+const EQUIPMENT_FILTERS: ('all' | Equipment)[] = [
+  'all',
+  'barbell',
+  'dumbbell',
+  'machine',
+  'cable',
+  'bodyweight',
+];
+
 export default function ExercisePickerScreen() {
   const router = useRouter();
   const { addExercisesToActive } = useWorkouts();
@@ -42,6 +51,7 @@ export default function ExercisePickerScreen() {
 
   const [search, setSearch] = useState('');
   const [muscleFilter, setMuscleFilter] = useState<'all' | MuscleGroup>('all');
+  const [equipmentFilter, setEquipmentFilter] = useState<'all' | Equipment>('all');
   const [selected, setSelected] = useState<string[]>([]);
 
   const filtered = useMemo(() => {
@@ -49,9 +59,11 @@ export default function ExercisePickerScreen() {
     return EXERCISES.filter((exercise) => {
       const matchesSearch = !term || exercise.name.toLowerCase().includes(term);
       const matchesMuscle = muscleFilter === 'all' || exercise.primaryMuscle === muscleFilter;
-      return matchesSearch && matchesMuscle;
+      const matchesEquipment =
+        equipmentFilter === 'all' || exercise.equipment === equipmentFilter;
+      return matchesSearch && matchesMuscle && matchesEquipment;
     });
-  }, [search, muscleFilter]);
+  }, [search, muscleFilter, equipmentFilter]);
 
   const toggle = (id: string) => {
     setSelected((current) =>
@@ -114,7 +126,7 @@ export default function ExercisePickerScreen() {
         <FlatList
           data={MUSCLE_FILTERS}
           horizontal
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => `muscle-${item}`}
           contentContainerStyle={styles.filterRow}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => {
@@ -124,6 +136,7 @@ export default function ExercisePickerScreen() {
                 onPress={() => setMuscleFilter(item)}
                 activeOpacity={0.7}
                 style={[styles.filterChip, isActive && styles.filterChipActive]}
+                testID={`filter-muscle-${item}`}
               >
                 <ThemedText
                   type="caption"
@@ -133,6 +146,39 @@ export default function ExercisePickerScreen() {
                   ]}
                 >
                   {item === 'all' ? 'All' : MUSCLE_LABELS[item]}
+                </ThemedText>
+              </TouchableOpacity>
+            );
+          }}
+        />
+
+        <FlatList
+          data={EQUIPMENT_FILTERS}
+          horizontal
+          keyExtractor={(item) => `equipment-${item}`}
+          contentContainerStyle={styles.filterRow}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => {
+            const isActive = item === equipmentFilter;
+            return (
+              <TouchableOpacity
+                onPress={() => setEquipmentFilter(item)}
+                activeOpacity={0.7}
+                style={[
+                  styles.filterChip,
+                  isActive && styles.filterChipActive,
+                  { borderWidth: 1, borderColor: Colors.neutral.border },
+                ]}
+                testID={`filter-equipment-${item}`}
+              >
+                <ThemedText
+                  type="caption"
+                  style={[
+                    styles.filterText,
+                    isActive && { color: Colors.neutral.textPrimary, fontWeight: '700' },
+                  ]}
+                >
+                  {item === 'all' ? 'Any equipment' : EQUIPMENT_LABELS[item]}
                 </ThemedText>
               </TouchableOpacity>
             );

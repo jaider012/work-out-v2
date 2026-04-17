@@ -18,3 +18,4 @@ executionOrder:
     - 08_settings_unit_toggle.yaml
     - 09_body_measurements.yaml
     - 10_set_types_and_calendar.yaml
+    - 11_banner_and_repeat.yaml

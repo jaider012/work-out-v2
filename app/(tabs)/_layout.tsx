@@ -1,7 +1,8 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 
+import { ActiveWorkoutBanner } from '@/components/ActiveWorkoutBanner';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
@@ -13,6 +14,7 @@ export default function TabLayout() {
   const colorScheme: 'light' | 'dark' = scheme === 'light' ? 'light' : 'dark';
 
   return (
+    <View style={{ flex: 1 }}>
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tabIconSelected,
@@ -66,5 +68,7 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    <ActiveWorkoutBanner />
+    </View>
   );
 }

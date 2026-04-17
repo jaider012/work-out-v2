@@ -37,6 +37,7 @@ Android emulator, or physical device.
 | `08_settings_unit_toggle.yaml` | Toggle weight unit between KG and LBS in Settings. |
 | `09_body_measurements.yaml` | Log a body weight entry and confirm it surfaces on Profile. |
 | `10_set_types_and_calendar.yaml` | Cycle the set type badge and navigate the history calendar. |
+| `11_banner_and_repeat.yaml` | Persistent banner, Discover copy + equipment filter smoke test. |
 
 Run them all in order:
 

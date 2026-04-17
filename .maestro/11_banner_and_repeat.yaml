@@ -1,0 +1,47 @@
+# Start a workout, confirm the persistent banner shows, repeat a past workout
+# and browse a Discover routine.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+
+# Start an empty workout from the home tab.
+- tapOn:
+    id: "home-start-empty-workout"
+- assertVisible:
+    id: "active-workout-name"
+- tapOn:
+    id: "chevron.down"
+    optional: true
+- tapOn:
+    text: "Home"
+
+# Persistent banner should be visible.
+- assertVisible:
+    id: "active-workout-banner"
+- tapOn:
+    id: "active-workout-banner"
+- tapOn:
+    id: "active-workout-discard"
+- tapOn:
+    text: "Discard"
+    optional: true
+
+# Discover section copy action
+- tapOn:
+    text: "Workout"
+- assertVisible: "DISCOVER"
+- tapOn:
+    id: "discover-copy-discover-ppl-push"
+- tapOn:
+    text: "OK"
+    optional: true
+- assertVisible: "Classic Push Day"
+
+# Equipment filter on exercise picker
+- tapOn:
+    id: "workout-quick-start"
+- tapOn:
+    id: "active-workout-add-exercise"
+- tapOn:
+    id: "filter-equipment-barbell"
+- assertVisible: "Bench Press (Barbell)"

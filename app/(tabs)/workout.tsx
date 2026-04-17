@@ -11,6 +11,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
 import { useWorkouts } from '@/contexts/WorkoutContext';
+import { DISCOVER_ROUTINES } from '@/data/discoverRoutines';
 import { getExerciseById } from '@/data/exercises';
 
 export default function WorkoutScreen() {
@@ -23,6 +24,7 @@ export default function WorkoutScreen() {
     startRoutine,
     duplicateRoutine,
     deleteRoutine,
+    saveRoutine,
   } = useWorkouts();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
@@ -167,6 +169,55 @@ export default function WorkoutScreen() {
             );
           })}
 
+          <View style={styles.sectionHeaderRow}>
+            <ThemedText type="caption" style={styles.sectionLabel}>
+              DISCOVER
+            </ThemedText>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.discoverRow}
+            style={{ marginBottom: Spacing.lg }}
+          >
+            {DISCOVER_ROUTINES.map((discover) => (
+              <View key={discover.id} style={styles.discoverCard}>
+                <ThemedText type="body" style={styles.discoverTitle}>
+                  {discover.name}
+                </ThemedText>
+                <ThemedText type="caption" style={styles.discoverDescription} numberOfLines={3}>
+                  {discover.description}
+                </ThemedText>
+                <ThemedText type="caption" style={styles.discoverMeta}>
+                  {discover.exercises.length} exercises
+                </ThemedText>
+                <Button
+                  title="Copy to my routines"
+                  variant="secondary"
+                  size="small"
+                  testID={`discover-copy-${discover.id}`}
+                  onPress={async () => {
+                    const copy = {
+                      ...discover,
+                      id: `routine-${Date.now()}-${Math.random()}`,
+                      name: discover.name,
+                      exercises: discover.exercises.map((ex, idx) => ({
+                        id: `${discover.id}-copy-${idx}`,
+                        exerciseId: ex.exerciseId,
+                        sets: ex.sets.map((s, setIdx) => ({
+                          ...s,
+                          id: `${discover.id}-copy-${idx}-set-${setIdx}`,
+                        })),
+                      })),
+                    };
+                    await saveRoutine(copy);
+                    Alert.alert('Copied', `"${copy.name}" added to your routines.`);
+                  }}
+                />
+              </View>
+            ))}
+          </ScrollView>
+
           {(grouped.get(undefined) ?? []).length > 0 ? (
             <View style={styles.folder}>
               <ThemedText type="caption" style={styles.folderName}>
@@ -287,4 +338,18 @@ const styles = StyleSheet.create({
   routineRow: { flexDirection: 'row', alignItems: 'center' },
   routineName: { color: Colors.neutral.textPrimary, fontWeight: '600' },
   routinePreview: { color: Colors.neutral.textSecondary, marginTop: 2 },
+  discoverRow: { gap: Spacing.sm, paddingBottom: 4 },
+  discoverCard: {
+    width: 240,
+    marginRight: Spacing.sm,
+    padding: Spacing.md,
+    borderRadius: 14,
+    backgroundColor: Colors.neutral.cardBackground,
+    borderWidth: 1,
+    borderColor: Colors.neutral.border,
+    gap: Spacing.xs,
+  },
+  discoverTitle: { color: Colors.neutral.textPrimary, fontWeight: '700' },
+  discoverDescription: { color: Colors.neutral.textSecondary, minHeight: 48 },
+  discoverMeta: { color: Colors.neutral.textTertiary, marginBottom: Spacing.xs },
 });

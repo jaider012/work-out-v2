@@ -1,19 +1,63 @@
+import { File, Paths } from 'expo-file-system';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import * as Sharing from 'expo-sharing';
+import React, { useState } from 'react';
+import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
+import { useMeasurements } from '@/contexts/MeasurementsContext';
 import { useSettings } from '@/contexts/SettingsContext';
+import { useWorkouts } from '@/contexts/WorkoutContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { weightUnit, setWeightUnit } = useSettings();
+  const { workouts, routines, folders } = useWorkouts();
+  const { measurements } = useMeasurements();
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        weightUnit,
+        workouts,
+        routines,
+        folders,
+        measurements,
+      };
+      const json = JSON.stringify(payload, null, 2);
+      if (Platform.OS === 'web') {
+        Alert.alert('Export', json.slice(0, 200) + '…');
+        return;
+      }
+      const file = new File(Paths.cache, `workout-v2-export-${Date.now()}.json`);
+      if (!file.exists) file.create();
+      file.write(json);
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(file.uri, {
+          mimeType: 'application/json',
+          dialogTitle: 'Export workout data',
+        });
+      } else {
+        Alert.alert('Export saved', `Saved to ${file.uri}`);
+      }
+    } catch (error) {
+      console.warn('Export failed', error);
+      Alert.alert('Export failed', 'Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -59,6 +103,24 @@ export default function SettingsScreen() {
                 })}
               </View>
             </View>
+          </Card>
+
+          <ThemedText type="caption" style={styles.sectionLabel}>
+            DATA
+          </ThemedText>
+          <Card style={styles.card}>
+            <Button
+              testID="settings-export"
+              title={exporting ? 'Exporting…' : 'Export data (JSON)'}
+              variant="secondary"
+              fullWidth
+              onPress={handleExport}
+              disabled={exporting}
+            />
+            <ThemedText type="caption" style={[styles.value, { marginTop: Spacing.sm }]}>
+              {workouts.length} workouts · {routines.length} routines · {measurements.length}{' '}
+              measurements
+            </ThemedText>
           </Card>
 
           <ThemedText type="caption" style={styles.sectionLabel}>
