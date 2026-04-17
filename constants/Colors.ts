@@ -1,59 +1,62 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
-/**
- * Fitness App Color Palette - Based on Modern Fitness App UI Design System
- * Primary theme: Dark mode with vibrant accents
+ * Color palette inspired by the Hevy gym tracker app.
+ * Hevy uses a dark-first design with a violet accent, near-black backgrounds
+ * and elevated cards in dark grey. Values below mirror that aesthetic while
+ * keeping the existing structure consumed across the app (primary / neutral /
+ * semantic / theme buckets).
  */
 
 export const Colors = {
-  // Primary Brand Colors
+  // Primary brand / accent colors (Hevy-style violet)
   primary: {
     vibrantOrange: '#FF6B35',
     gradientRed: '#FF4500',
-    accentBlue: '#4A90E2',
-    brightGreen: '#7ED321',
+    accentBlue: '#7C5CFF',
+    accentViolet: '#7C5CFF',
+    accentVioletPressed: '#6747E6',
+    brightGreen: '#34C759',
   },
-  
-  // Neutral Colors
+
+  // Neutral backgrounds and text
   neutral: {
-    darkBackground: '#1A1A1A',
-    cardBackground: '#2A2A2A',
+    darkBackground: '#0E0E10',
+    cardBackground: '#1C1C1F',
+    elevatedBackground: '#26262B',
+    border: '#2A2A2F',
     lightBackground: '#FFFFFF',
     textPrimary: '#FFFFFF',
-    textSecondary: '#9B9B9B',
-    textTertiary: '#666666',
+    textSecondary: '#A0A0A8',
+    textTertiary: '#6B6B73',
   },
-  
-  // Semantic Colors
+
+  // Semantic colors
   semantic: {
-    success: '#7ED321',
-    warning: '#F5A623',
-    error: '#D0021B',
-    info: '#4A90E2',
+    success: '#34C759',
+    warning: '#FFB020',
+    error: '#FF3B30',
+    info: '#7C5CFF',
+    pr: '#FFB020', // personal record highlight
   },
-  
-  // Theme-based colors for components
+
+  // Theme-aware tokens (light/dark) consumed by useThemeColor
   light: {
-    text: '#1A1A1A',
+    text: '#0E0E10',
     background: '#FFFFFF',
-    tint: '#4A90E2',
-    icon: '#666666',
-    tabIconDefault: '#9B9B9B',
-    tabIconSelected: '#4A90E2',
-    card: '#F8F9FA',
+    tint: '#7C5CFF',
+    icon: '#6B6B73',
+    tabIconDefault: '#A0A0A8',
+    tabIconSelected: '#7C5CFF',
+    card: '#F4F4F6',
     border: '#E5E5EA',
   },
   dark: {
     text: '#FFFFFF',
-    background: '#1A1A1A',
-    tint: '#4A90E2',
-    icon: '#9B9B9B',
-    tabIconDefault: '#666666',
-    tabIconSelected: '#4A90E2',
-    card: '#2A2A2A',
-    border: '#3A3A3A',
+    background: '#0E0E10',
+    tint: '#7C5CFF',
+    icon: '#A0A0A8',
+    tabIconDefault: '#6B6B73',
+    tabIconSelected: '#7C5CFF',
+    card: '#1C1C1F',
+    border: '#2A2A2F',
   },
 };

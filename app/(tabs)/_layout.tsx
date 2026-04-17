@@ -9,12 +9,14 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const scheme = useColorScheme();
+  const colorScheme: 'light' | 'dark' = scheme === 'light' ? 'light' : 'dark';
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
+        tabBarActiveTintColor: Colors[colorScheme].tabIconSelected,
+        tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
@@ -22,42 +24,45 @@ export default function TabLayout() {
           ios: {
             position: 'absolute',
             backgroundColor: Colors.neutral.cardBackground,
+            borderTopColor: Colors.neutral.border,
           },
           default: {
             backgroundColor: Colors.neutral.cardBackground,
+            borderTopColor: Colors.neutral.border,
           },
         }),
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '500',
         },
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Workouts',
+          title: 'Home',
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="house.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="workout"
+        options={{
+          title: 'Workout',
           tabBarIcon: ({ color }) => <IconSymbol size={24} name="dumbbell" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="routines"
+        name="history"
         options={{
-          title: 'Routines',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="list.bullet" color={color} />,
+          title: 'History',
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="calendar" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="progress"
+        name="profile"
         options={{
-          title: 'Progress',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="chart.line.uptrend.xyaxis" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <IconSymbol size={24} name="gearshape.fill" color={color} />,
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <IconSymbol size={24} name="person.fill" color={color} />,
         }}
       />
     </Tabs>

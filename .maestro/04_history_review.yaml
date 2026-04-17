@@ -1,0 +1,20 @@
+# Verify that finished workouts show up in History and Profile.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+
+# History tab shows the latest workout we logged.
+- tapOn:
+    text: "History"
+- assertVisible: "THIS WEEK"
+- assertVisible:
+    text: "Maestro Quick Start"
+    timeout: 5000
+    optional: true
+
+# Profile tab shows aggregate stats and muscle distribution.
+- tapOn:
+    text: "Profile"
+- assertVisible: "MUSCLE DISTRIBUTION (7D)"
+- assertVisible:
+    text: "Workouts"

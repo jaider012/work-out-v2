@@ -8,38 +8,55 @@ import 'react-native-reanimated';
 
 import { Colors } from '@/constants/Colors';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { WorkoutProvider } from '@/contexts/WorkoutContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
+
+function FullScreenLoader() {
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: Colors.neutral.darkBackground,
+      }}
+    >
+      <ActivityIndicator size="large" color={Colors.primary.accentViolet} />
+    </View>
+  );
+}
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        backgroundColor: Colors.neutral.darkBackground 
-      }}>
-        <ActivityIndicator size="large" color={Colors.primary.accentBlue} />
-      </View>
-    );
+    return <FullScreenLoader />;
   }
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.neutral.darkBackground } }}>
         {user ? (
-          // User is signed in
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         ) : (
-          // User is not signed in
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         )}
+        <Stack.Screen
+          name="active-workout"
+          options={{ presentation: 'modal', headerShown: false, gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="exercise-picker"
+          options={{ presentation: 'modal', headerShown: false }}
+        />
+        <Stack.Screen
+          name="workout/[id]"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style="light" />
     </ThemeProvider>
   );
 }
@@ -50,21 +67,14 @@ export default function RootLayout() {
   });
 
   if (!loaded) {
-    return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        backgroundColor: Colors.neutral.darkBackground 
-      }}>
-        <ActivityIndicator size="large" color={Colors.primary.accentBlue} />
-      </View>
-    );
+    return <FullScreenLoader />;
   }
 
   return (
     <AuthProvider>
-      <RootLayoutNav />
+      <WorkoutProvider>
+        <RootLayoutNav />
+      </WorkoutProvider>
     </AuthProvider>
   );
 }

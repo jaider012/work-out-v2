@@ -1,0 +1,28 @@
+# Authenticates an existing test user.
+# Provide credentials via environment variables when running locally / in CI:
+#   E2E_EMAIL=test@example.com E2E_PASSWORD=hunter2 maestro test .maestro/01_sign_in.yaml
+appId: ${APP_ID:-host.exp.Exponent}
+env:
+  EMAIL: ${E2E_EMAIL:-e2e-test@workout-v2.local}
+  PASSWORD: ${E2E_PASSWORD:-Test123!}
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: "welcome-get-started"
+- tapOn:
+    id: "welcome-sign-in"
+- assertVisible: "Welcome Back"
+- tapOn:
+    id: "sign-in-email"
+- inputText: ${EMAIL}
+- hideKeyboard
+- tapOn:
+    id: "sign-in-password"
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn:
+    id: "sign-in-submit"
+- assertVisible:
+    text: "Welcome back"
+    timeout: 15000

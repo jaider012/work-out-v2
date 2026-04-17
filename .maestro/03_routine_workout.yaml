@@ -1,0 +1,35 @@
+# Start a sample routine (Push Day) and finish it without changes.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+- tapOn:
+    text: "Workout"
+    index: 0
+
+# Open the Push/Pull/Legs folder if collapsed and start "Push Day".
+- assertVisible: "Push Day"
+- tapOn:
+    id: "routine-start-push-day"
+
+- assertVisible:
+    id: "active-workout-name"
+- assertVisible:
+    text: "Push Day"
+
+# Tick the first set of the first exercise.
+- tapOn:
+    text: "✓"
+    index: 0
+    optional: true
+
+- tapOn:
+    id: "active-workout-finish"
+
+# Confirm "Finish anyway" if no sets were checked (defensive)
+- tapOn:
+    text: "Finish"
+    optional: true
+
+- assertVisible:
+    text: "History"
+    timeout: 10000
