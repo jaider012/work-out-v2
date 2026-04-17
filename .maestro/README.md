@@ -31,6 +31,9 @@ Android emulator, or physical device.
 | `02_quick_start_workout.yaml` | Workout tab → Quick Start → add Bench Press → log a set → Finish. |
 | `03_routine_workout.yaml` | Workout tab → start "Push Day" routine → tick a set → Finish. |
 | `04_history_review.yaml` | History tab shows the workout, Profile shows stats. |
+| `05_create_routine.yaml` | Workout tab → New Routine → add 2 exercises → Save. |
+| `06_rest_timer_and_pr.yaml` | Heavy single → rest timer overlay → finish triggers PR alert. |
+| `07_exercise_detail.yaml` | Profile → Browse exercises → open Bench Press detail. |
 
 Run them all in order:
 

@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -15,8 +15,43 @@ import { getExerciseById } from '@/data/exercises';
 
 export default function WorkoutScreen() {
   const router = useRouter();
-  const { routines, folders, activeWorkout, startEmptyWorkout, startRoutine } = useWorkouts();
+  const {
+    routines,
+    folders,
+    activeWorkout,
+    startEmptyWorkout,
+    startRoutine,
+    duplicateRoutine,
+    deleteRoutine,
+  } = useWorkouts();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+
+  const onRoutineLongPress = (routineId: string, name: string) => {
+    Alert.alert(name, 'Routine actions', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Edit', onPress: () => router.push(`/routine/${routineId}`) },
+      {
+        text: 'Duplicate',
+        onPress: async () => {
+          await duplicateRoutine(routineId);
+        },
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          Alert.alert('Delete routine?', `"${name}" will be removed.`, [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Delete',
+              style: 'destructive',
+              onPress: () => deleteRoutine(routineId),
+            },
+          ]);
+        },
+      },
+    ]);
+  };
 
   const grouped = useMemo(() => {
     const map = new Map<string | undefined, typeof routines>();
@@ -81,7 +116,11 @@ export default function WorkoutScreen() {
             <ThemedText type="caption" style={styles.sectionLabel}>
               ROUTINES
             </ThemedText>
-            <TouchableOpacity activeOpacity={0.7} onPress={() => {}}>
+            <TouchableOpacity
+              testID="workout-new-routine"
+              activeOpacity={0.7}
+              onPress={() => router.push('/routine/new')}
+            >
               <ThemedText type="caption" style={styles.actionText}>
                 + New Routine
               </ThemedText>
@@ -120,6 +159,8 @@ export default function WorkoutScreen() {
                         .map((ex) => getExerciseById(ex.exerciseId)?.name ?? 'Exercise')
                         .filter(Boolean)}
                       onStart={() => handleStartRoutine(routine.id)}
+                      onPress={() => router.push(`/routine/${routine.id}`)}
+                      onLongPress={() => onRoutineLongPress(routine.id, routine.name)}
                     />
                   ))}
               </View>
@@ -139,6 +180,8 @@ export default function WorkoutScreen() {
                     .map((ex) => getExerciseById(ex.exerciseId)?.name ?? 'Exercise')
                     .filter(Boolean)}
                   onStart={() => handleStartRoutine(routine.id)}
+                  onPress={() => router.push(`/routine/${routine.id}`)}
+                  onLongPress={() => onRoutineLongPress(routine.id, routine.name)}
                 />
               ))}
             </View>
@@ -153,34 +196,45 @@ function RoutineRow({
   name,
   exerciseNames,
   onStart,
+  onPress,
+  onLongPress,
 }: {
   name: string;
   exerciseNames: string[];
   onStart: () => void;
+  onPress?: () => void;
+  onLongPress?: () => void;
 }) {
   const preview = exerciseNames.slice(0, 3).join(', ');
   const remaining = Math.max(0, exerciseNames.length - 3);
   return (
-    <Card style={styles.routineCard}>
-      <View style={styles.routineRow}>
-        <View style={{ flex: 1, marginRight: Spacing.sm }}>
-          <ThemedText type="body" style={styles.routineName}>
-            {name}
-          </ThemedText>
-          <ThemedText type="caption" style={styles.routinePreview} numberOfLines={2}>
-            {preview}
-            {remaining > 0 ? `, +${remaining} more` : ''}
-          </ThemedText>
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={300}
+    >
+      <Card style={styles.routineCard}>
+        <View style={styles.routineRow}>
+          <View style={{ flex: 1, marginRight: Spacing.sm }}>
+            <ThemedText type="body" style={styles.routineName}>
+              {name}
+            </ThemedText>
+            <ThemedText type="caption" style={styles.routinePreview} numberOfLines={2}>
+              {preview}
+              {remaining > 0 ? `, +${remaining} more` : ''}
+            </ThemedText>
+          </View>
+          <Button
+            testID={`routine-start-${name.toLowerCase().replace(/\s+/g, '-')}`}
+            title="Start"
+            onPress={onStart}
+            variant="primary"
+            size="small"
+          />
         </View>
-        <Button
-          testID={`routine-start-${name.toLowerCase().replace(/\s+/g, '-')}`}
-          title="Start"
-          onPress={onStart}
-          variant="primary"
-          size="small"
-        />
-      </View>
-    </Card>
+      </Card>
+    </TouchableOpacity>
   );
 }
 

@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
+import { useExercisePickerBus } from '@/contexts/ExercisePickerBus';
 import { useWorkouts } from '@/contexts/WorkoutContext';
 import { EQUIPMENT_LABELS, EXERCISES, MUSCLE_LABELS } from '@/data/exercises';
 import type { Exercise, MuscleGroup } from '@/types/workout';
@@ -36,6 +37,7 @@ const MUSCLE_FILTERS: ('all' | MuscleGroup)[] = [
 export default function ExercisePickerScreen() {
   const router = useRouter();
   const { addExercisesToActive } = useWorkouts();
+  const pickerBus = useExercisePickerBus();
   const params = useLocalSearchParams<{ mode?: string }>();
 
   const [search, setSearch] = useState('');
@@ -61,6 +63,8 @@ export default function ExercisePickerScreen() {
     if (selected.length === 0) return;
     if (params.mode === 'active') {
       addExercisesToActive(selected);
+    } else if (params.mode === 'routine') {
+      pickerBus.publish(selected);
     }
     router.back();
   };

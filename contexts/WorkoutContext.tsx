@@ -9,13 +9,17 @@ import type {
   WorkoutExercise,
   WorkoutSet,
 } from '@/types/workout';
+import { detectPRs } from '@/utils/exerciseHistory';
 
 const STORAGE_KEYS = {
   workouts: '@workout-v2/workouts',
   routines: '@workout-v2/routines',
   folders: '@workout-v2/folders',
   active: '@workout-v2/active-workout',
+  prs: '@workout-v2/personal-records',
 };
+
+export const DEFAULT_REST_SECONDS = 90;
 
 type WorkoutContextValue = {
   loading: boolean;
@@ -23,11 +27,16 @@ type WorkoutContextValue = {
   routines: Routine[];
   folders: RoutineFolder[];
   activeWorkout: Workout | null;
+  /** Set ids ("workoutExerciseId:setId") that earned a personal record. */
+  personalRecords: string[];
 
   // active workout actions
   startEmptyWorkout: () => Workout;
   startRoutine: (routineId: string) => Workout | null;
-  finishActiveWorkout: () => Promise<Workout | null>;
+  finishActiveWorkout: () => Promise<{
+    workout: Workout;
+    newPRs: string[];
+  } | null>;
   discardActiveWorkout: () => Promise<void>;
   updateActiveWorkout: (updater: (workout: Workout) => Workout) => void;
   addExercisesToActive: (exerciseIds: string[]) => void;
@@ -35,10 +44,14 @@ type WorkoutContextValue = {
   addSetToExercise: (workoutExerciseId: string) => void;
   updateSet: (workoutExerciseId: string, setId: string, patch: Partial<WorkoutSet>) => void;
   removeSet: (workoutExerciseId: string, setId: string) => void;
+  setExerciseRest: (workoutExerciseId: string, restSeconds: number | undefined) => void;
+  saveActiveAsRoutine: (name: string, folderId?: string) => Promise<Routine | null>;
 
   // routines
-  saveRoutine: (routine: Routine) => Promise<void>;
+  saveRoutine: (routine: Routine) => Promise<Routine>;
   deleteRoutine: (routineId: string) => Promise<void>;
+  duplicateRoutine: (routineId: string) => Promise<Routine | null>;
+  createFolder: (name: string) => Promise<RoutineFolder>;
 };
 
 const WorkoutContext = createContext<WorkoutContextValue | undefined>(undefined);
@@ -60,23 +73,26 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [folders, setFolders] = useState<RoutineFolder[]>([]);
   const [activeWorkout, setActiveWorkout] = useState<Workout | null>(null);
+  const [personalRecords, setPersonalRecords] = useState<string[]>([]);
 
   // Hydrate from AsyncStorage on mount.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [workoutsRaw, routinesRaw, foldersRaw, activeRaw] = await Promise.all([
+        const [workoutsRaw, routinesRaw, foldersRaw, activeRaw, prsRaw] = await Promise.all([
           AsyncStorage.getItem(STORAGE_KEYS.workouts),
           AsyncStorage.getItem(STORAGE_KEYS.routines),
           AsyncStorage.getItem(STORAGE_KEYS.folders),
           AsyncStorage.getItem(STORAGE_KEYS.active),
+          AsyncStorage.getItem(STORAGE_KEYS.prs),
         ]);
         if (cancelled) return;
         setWorkouts(workoutsRaw ? JSON.parse(workoutsRaw) : []);
         setRoutines(routinesRaw ? JSON.parse(routinesRaw) : SAMPLE_ROUTINES);
         setFolders(foldersRaw ? JSON.parse(foldersRaw) : SAMPLE_FOLDERS);
         setActiveWorkout(activeRaw ? JSON.parse(activeRaw) : null);
+        setPersonalRecords(prsRaw ? JSON.parse(prsRaw) : []);
       } catch (error) {
         console.warn('Failed to hydrate workout state', error);
       } finally {
@@ -113,6 +129,11 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     }
   }, [loading, activeWorkout]);
 
+  useEffect(() => {
+    if (loading) return;
+    AsyncStorage.setItem(STORAGE_KEYS.prs, JSON.stringify(personalRecords)).catch(() => {});
+  }, [loading, personalRecords]);
+
   const startEmptyWorkout = useCallback((): Workout => {
     const workout: Workout = {
       id: newId('workout'),
@@ -148,7 +169,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     [routines],
   );
 
-  const finishActiveWorkout = useCallback(async (): Promise<Workout | null> => {
+  const finishActiveWorkout = useCallback(async () => {
     if (!activeWorkout) return null;
     const finishedAt = new Date().toISOString();
     const durationSeconds = Math.max(
@@ -161,15 +182,20 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       ...activeWorkout,
       finishedAt,
       durationSeconds,
-      exercises: activeWorkout.exercises.map((ex) => ({
-        ...ex,
-        sets: ex.sets.filter((set) => set.completed),
-      })),
+      exercises: activeWorkout.exercises
+        .map((ex) => ({
+          ...ex,
+          sets: ex.sets.filter((set) => set.completed),
+        }))
+        .filter((ex) => ex.sets.length > 0),
     };
+    const newPRSet = detectPRs(finished, workouts);
+    const newPRs = Array.from(newPRSet);
     setWorkouts((prev) => [finished, ...prev]);
+    setPersonalRecords((prev) => Array.from(new Set([...prev, ...newPRs])));
     setActiveWorkout(null);
-    return finished;
-  }, [activeWorkout]);
+    return { workout: finished, newPRs };
+  }, [activeWorkout, workouts]);
 
   const discardActiveWorkout = useCallback(async () => {
     setActiveWorkout(null);
@@ -251,16 +277,83 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const setExerciseRest = useCallback(
+    (workoutExerciseId: string, restSeconds: number | undefined) => {
+      setActiveWorkout((current) => {
+        if (!current) return current;
+        return {
+          ...current,
+          exercises: current.exercises.map((ex) =>
+            ex.id === workoutExerciseId ? { ...ex, restSeconds } : ex,
+          ),
+        };
+      });
+    },
+    [],
+  );
+
+  const saveActiveAsRoutine = useCallback(
+    async (name: string, folderId?: string) => {
+      if (!activeWorkout) return null;
+      const routine: Routine = {
+        id: newId('routine'),
+        name: name.trim() || activeWorkout.name || 'Routine',
+        folderId,
+        updatedAt: new Date().toISOString(),
+        exercises: activeWorkout.exercises.map((ex) => ({
+          id: newId('we'),
+          exerciseId: ex.exerciseId,
+          notes: ex.notes,
+          restSeconds: ex.restSeconds,
+          sets: (ex.sets.length ? ex.sets : [createEmptySet()]).map(() => createEmptySet()),
+        })),
+      };
+      setRoutines((prev) => [routine, ...prev]);
+      return routine;
+    },
+    [activeWorkout],
+  );
+
   const saveRoutine = useCallback(async (routine: Routine) => {
+    const updated = { ...routine, updatedAt: new Date().toISOString() };
     setRoutines((prev) => {
       const exists = prev.some((r) => r.id === routine.id);
-      const updated = { ...routine, updatedAt: new Date().toISOString() };
       return exists ? prev.map((r) => (r.id === routine.id ? updated : r)) : [updated, ...prev];
     });
+    return updated;
   }, []);
 
   const deleteRoutine = useCallback(async (routineId: string) => {
     setRoutines((prev) => prev.filter((r) => r.id !== routineId));
+  }, []);
+
+  const duplicateRoutine = useCallback(
+    async (routineId: string) => {
+      const target = routines.find((r) => r.id === routineId);
+      if (!target) return null;
+      const copy: Routine = {
+        ...target,
+        id: newId('routine'),
+        name: `${target.name} (copy)`,
+        updatedAt: new Date().toISOString(),
+        exercises: target.exercises.map((ex) => ({
+          id: newId('we'),
+          exerciseId: ex.exerciseId,
+          notes: ex.notes,
+          restSeconds: ex.restSeconds,
+          sets: ex.sets.map(() => createEmptySet()),
+        })),
+      };
+      setRoutines((prev) => [copy, ...prev]);
+      return copy;
+    },
+    [routines],
+  );
+
+  const createFolder = useCallback(async (name: string) => {
+    const folder: RoutineFolder = { id: newId('folder'), name: name.trim() || 'Folder' };
+    setFolders((prev) => [...prev, folder]);
+    return folder;
   }, []);
 
   const value = useMemo<WorkoutContextValue>(
@@ -270,6 +363,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       routines,
       folders,
       activeWorkout,
+      personalRecords,
       startEmptyWorkout,
       startRoutine,
       finishActiveWorkout,
@@ -280,8 +374,12 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       addSetToExercise,
       updateSet,
       removeSet,
+      setExerciseRest,
+      saveActiveAsRoutine,
       saveRoutine,
       deleteRoutine,
+      duplicateRoutine,
+      createFolder,
     }),
     [
       loading,
@@ -289,6 +387,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       routines,
       folders,
       activeWorkout,
+      personalRecords,
       startEmptyWorkout,
       startRoutine,
       finishActiveWorkout,
@@ -299,8 +398,12 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       addSetToExercise,
       updateSet,
       removeSet,
+      setExerciseRest,
+      saveActiveAsRoutine,
       saveRoutine,
       deleteRoutine,
+      duplicateRoutine,
+      createFolder,
     ],
   );
 

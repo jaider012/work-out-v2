@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Alert, FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -11,7 +11,8 @@ import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWorkouts } from '@/contexts/WorkoutContext';
-import { MUSCLE_LABELS } from '@/data/exercises';
+import { EXERCISES, MUSCLE_LABELS } from '@/data/exercises';
+import { bestOneRepMax } from '@/utils/exerciseHistory';
 import {
   computeWorkoutVolumeKg,
   muscleVolumeMap,
@@ -22,7 +23,9 @@ import {
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { workouts } = useWorkouts();
+  const { workouts, personalRecords } = useWorkouts();
+  const [exercisesSheetOpen, setExercisesSheetOpen] = useState(false);
+  const [exerciseSearch, setExerciseSearch] = useState('');
 
   const lastWeek = useMemo(() => workoutsInLastDays(workouts, 7), [workouts]);
 
@@ -33,8 +36,30 @@ export default function ProfileScreen() {
       workoutsThisWeek: lastWeek.length,
       totalVolume,
       totalSets: workouts.reduce((sum, w) => sum + totalSets(w), 0),
+      personalRecords: personalRecords.length,
     };
-  }, [workouts, lastWeek]);
+  }, [workouts, lastWeek, personalRecords]);
+
+  const topExercises = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const w of workouts) {
+      for (const ex of w.exercises) {
+        for (const s of ex.sets) {
+          map.set(ex.exerciseId, (map.get(ex.exerciseId) ?? 0) + s.weight * s.reps);
+        }
+      }
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([id, volume]) => ({ id, volume, oneRm: bestOneRepMax(workouts, id) }));
+  }, [workouts]);
+
+  const filteredExercises = useMemo(() => {
+    const term = exerciseSearch.trim().toLowerCase();
+    if (!term) return EXERCISES;
+    return EXERCISES.filter((e) => e.name.toLowerCase().includes(term));
+  }, [exerciseSearch]);
 
   const muscleMap = useMemo(() => muscleVolumeMap(lastWeek), [lastWeek]);
   const muscleEntries = useMemo(() => {
@@ -91,7 +116,7 @@ export default function ProfileScreen() {
               <Stat title="Workouts" value={String(stats.workoutsAllTime)} />
               <Stat title="This week" value={String(stats.workoutsThisWeek)} />
               <Stat title="Sets" value={String(stats.totalSets)} />
-              <Stat title="Volume" value={`${Math.round(stats.totalVolume / 1000)}t`} />
+              <Stat title="PRs" value={String(stats.personalRecords)} />
             </View>
           </Card>
 
@@ -126,6 +151,57 @@ export default function ProfileScreen() {
             )}
           </Section>
 
+          <Section title="MAIN EXERCISES">
+            {topExercises.length === 0 ? (
+              <Card>
+                <ThemedText type="caption" style={styles.muted}>
+                  Log a workout to see your most-trained exercises here.
+                </ThemedText>
+              </Card>
+            ) : (
+              <Card style={styles.menuCard}>
+                {topExercises.map((entry) => {
+                  const exercise = EXERCISES.find((e) => e.id === entry.id);
+                  return (
+                    <TouchableOpacity
+                      key={entry.id}
+                      activeOpacity={0.7}
+                      style={styles.row}
+                      onPress={() => router.push(`/exercise/${entry.id}`)}
+                    >
+                      <IconSymbol
+                        name="figure.strengthtraining.traditional"
+                        size={20}
+                        color={Colors.primary.accentViolet}
+                      />
+                      <View style={{ flex: 1 }}>
+                        <ThemedText type="body" style={styles.rowLabel}>
+                          {exercise?.name ?? entry.id}
+                        </ThemedText>
+                        <ThemedText type="caption" style={styles.muted}>
+                          {Math.round(entry.volume)} kg total · e1RM {entry.oneRm} kg
+                        </ThemedText>
+                      </View>
+                      <IconSymbol name="chevron.right" size={18} color={Colors.neutral.textTertiary} />
+                    </TouchableOpacity>
+                  );
+                })}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.row}
+                  onPress={() => setExercisesSheetOpen(true)}
+                  testID="profile-browse-exercises"
+                >
+                  <IconSymbol name="magnifyingglass" size={20} color={Colors.neutral.textPrimary} />
+                  <ThemedText type="body" style={styles.rowLabel}>
+                    Browse all exercises
+                  </ThemedText>
+                  <IconSymbol name="chevron.right" size={18} color={Colors.neutral.textTertiary} />
+                </TouchableOpacity>
+              </Card>
+            )}
+          </Section>
+
           <Section title="ACCOUNT">
             <Card style={styles.menuCard}>
               <Row icon="person.crop.circle" label="Edit Profile" onPress={() => {}} />
@@ -151,6 +227,72 @@ export default function ProfileScreen() {
             />
           </Card>
         </ScrollView>
+
+        <Modal
+          visible={exercisesSheetOpen}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setExercisesSheetOpen(false)}
+        >
+          <ThemedView style={{ flex: 1 }}>
+            <SafeAreaView style={{ flex: 1 }}>
+              <View style={styles.modalTop}>
+                <Pressable onPress={() => setExercisesSheetOpen(false)}>
+                  <ThemedText type="body" style={{ color: Colors.neutral.textSecondary }}>
+                    Close
+                  </ThemedText>
+                </Pressable>
+                <ThemedText type="h2" style={{ color: Colors.neutral.textPrimary }}>
+                  Exercises
+                </ThemedText>
+                <View style={{ width: 50 }} />
+              </View>
+              <View style={styles.modalSearch}>
+                <IconSymbol name="magnifyingglass" size={18} color={Colors.neutral.textSecondary} />
+                <TextInput
+                  value={exerciseSearch}
+                  onChangeText={setExerciseSearch}
+                  placeholder="Search exercises"
+                  placeholderTextColor={Colors.neutral.textTertiary}
+                  style={styles.modalSearchInput}
+                />
+              </View>
+              <FlatList
+                data={filteredExercises}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={{ padding: Spacing.md }}
+                ItemSeparatorComponent={() => (
+                  <View style={{ height: 1, backgroundColor: Colors.neutral.border }} />
+                )}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={styles.row}
+                    onPress={() => {
+                      setExercisesSheetOpen(false);
+                      router.push(`/exercise/${item.id}`);
+                    }}
+                  >
+                    <IconSymbol
+                      name="figure.strengthtraining.traditional"
+                      size={20}
+                      color={Colors.neutral.textPrimary}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <ThemedText type="body" style={styles.rowLabel}>
+                        {item.name}
+                      </ThemedText>
+                      <ThemedText type="caption" style={styles.muted}>
+                        {MUSCLE_LABELS[item.primaryMuscle]}
+                      </ThemedText>
+                    </View>
+                    <IconSymbol name="chevron.right" size={18} color={Colors.neutral.textTertiary} />
+                  </TouchableOpacity>
+                )}
+              />
+            </SafeAreaView>
+          </ThemedView>
+        </Modal>
       </SafeAreaView>
     </ThemedView>
   );
@@ -260,4 +402,23 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   rowLabel: { color: Colors.neutral.textPrimary, flex: 1 },
+  modalTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.neutral.border,
+  },
+  modalSearch: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: Spacing.md,
+    paddingHorizontal: Spacing.sm,
+    backgroundColor: Colors.neutral.cardBackground,
+    borderRadius: 10,
+    gap: Spacing.xs,
+  },
+  modalSearchInput: { flex: 1, color: Colors.neutral.textPrimary, paddingVertical: Spacing.sm },
 });

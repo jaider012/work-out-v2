@@ -78,15 +78,23 @@ The project was on Expo SDK 53.0.12 (RN 0.79). It was bumped to **SDK 55.0.15**
 types/workout.ts                    # Exercise, WorkoutSet, Workout, Routine types
 data/exercises.ts                   # ~35 starter exercises across muscle groups
 data/sampleRoutines.ts              # Sample folders + Push/Pull/Legs routines
-contexts/WorkoutContext.tsx         # AsyncStorage-backed state (active + log)
+contexts/WorkoutContext.tsx         # AsyncStorage-backed state (active + log + PRs)
+contexts/RestTimerContext.tsx       # Cross-screen rest timer with haptic feedback
+contexts/ExercisePickerBus.tsx      # Pub/sub bus for exercise picker → routine editor
+components/RestTimerOverlay.tsx     # Floating rest-timer chip (auto-shows when active)
+components/RoutineEditor.tsx        # Shared editor used by /routine/new and /routine/[id]
 utils/workoutStats.ts               # Volume, sets, muscle distribution helpers
+utils/exerciseHistory.ts            # Previous session, best set, e1RM, PR detection
 app/(tabs)/index.tsx                # Home / Feed
-app/(tabs)/workout.tsx              # Quick Start + folders + routines
+app/(tabs)/workout.tsx              # Quick Start + folders + routines (long-press menu)
 app/(tabs)/history.tsx              # Weekly activity + grouped history list
-app/(tabs)/profile.tsx              # Stats, muscle distribution, settings menu
-app/active-workout.tsx              # Modal: live set/rep logging + timer
-app/exercise-picker.tsx             # Modal: search + muscle filter + multi-select
+app/(tabs)/profile.tsx              # Stats + main exercises + browse all + settings
+app/active-workout.tsx              # Modal: logging, previous values, PR badges, rest timer, save-as-routine
+app/exercise-picker.tsx             # Modal: search + muscle filter + multi-select (active/routine modes)
 app/workout/[id].tsx                # Past workout detail
+app/routine/new.tsx                 # Create routine
+app/routine/[id].tsx                # Edit routine
+app/exercise/[id].tsx               # Exercise detail with stats + history
 HEVY_RESEARCH.md                    # This file
 ```
 
@@ -119,6 +127,9 @@ target stable `testID`s sprinkled through the auth + workout screens (see the
 | `02_quick_start_workout.yaml` | Quick Start → add Bench Press → log a set → Finish |
 | `03_routine_workout.yaml` | Push Day routine → Finish |
 | `04_history_review.yaml` | Workout shows up in History + Profile stats render |
+| `05_create_routine.yaml` | New Routine → add 2 exercises → Save |
+| `06_rest_timer_and_pr.yaml` | Heavy single → rest timer overlay → PR alert |
+| `07_exercise_detail.yaml` | Profile → Browse exercises → Bench Press detail |
 
 Run them with:
 
@@ -128,17 +139,29 @@ yarn e2e:flow .maestro/02_quick_start_workout.yaml
 APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 ```
 
-## 5. What is left to build
+## 5. Hevy-parity features now implemented
 
-Things the real Hevy app has that this clone does not yet implement:
+- ✅ Routine editor (create / edit / delete, folder picker, ad-hoc folder
+  creation) reachable from the Workout tab and via long-press on a routine.
+- ✅ Per-exercise history list with stats (sessions, total sets, best e1RM,
+  heaviest set) at `/exercise/[id]`.
+- ✅ Personal record detection on every finished workout (Epley e1RM); PR sets
+  show a "PR" badge in the active workout and trigger an alert at finish time.
+- ✅ "Previous" set values shown alongside the current input (so you know
+  what you lifted last time, exactly like Hevy).
+- ✅ Cross-screen rest timer with chip overlay, ±15 s controls, haptic on
+  completion and per-exercise rest preset (Off / 60s / 90s / 2m / 3m / 4m).
+- ✅ "Save as routine" from inside an active workout.
+- ✅ Profile tab now lists Main Exercises (top by volume) and a search-driven
+  "Browse all exercises" sheet that links to the exercise detail page.
+
+## 6. What is still left to build
 
 - Real social graph (the home feed currently shows only the local user's
   finished workouts).
-- Routine editor UI (the model + persistence is there; only the screen is
-  missing).
-- Per-exercise history graphs (1RM, heaviest set, total volume per session).
+- Per-exercise history graphs / charts (we list the data, no svg chart yet).
 - Body measurements + progress photos.
-- Rest timer with notifications.
-- Personal record detection and badges.
+- Rest timer push notification when the app is backgrounded.
 - Cloud sync (currently AsyncStorage only).
 - Apple Health / Google Fit integration.
+- Drag-and-drop reordering of exercises and sets.

@@ -1,7 +1,10 @@
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
+  Modal,
+  Pressable,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -10,20 +13,26 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { RestTimerOverlay } from '@/components/RestTimerOverlay';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
-import { useWorkouts } from '@/contexts/WorkoutContext';
+import { DEFAULT_REST_SECONDS, useWorkouts } from '@/contexts/WorkoutContext';
+import { useRestTimer } from '@/contexts/RestTimerContext';
 import { getExerciseById } from '@/data/exercises';
+import { previousSession, estimateOneRepMax, bestOneRepMax } from '@/utils/exerciseHistory';
 import { computeWorkoutVolumeKg, totalSets } from '@/utils/workoutStats';
+
+const REST_PRESETS = [60, 90, 120, 180, 240];
 
 export default function ActiveWorkoutScreen() {
   const router = useRouter();
   const {
     activeWorkout,
+    workouts,
     finishActiveWorkout,
     discardActiveWorkout,
     removeExerciseFromActive,
@@ -31,9 +40,16 @@ export default function ActiveWorkoutScreen() {
     updateSet,
     removeSet,
     updateActiveWorkout,
+    setExerciseRest,
+    saveActiveAsRoutine,
   } = useWorkouts();
+  const restTimer = useRestTimer();
 
   const [, force] = useState(0);
+  const [restSheetFor, setRestSheetFor] = useState<string | null>(null);
+  const [saveSheetOpen, setSaveSheetOpen] = useState(false);
+  const [saveRoutineName, setSaveRoutineName] = useState('');
+
   useEffect(() => {
     const id = setInterval(() => force((n) => n + 1), 1000);
     return () => clearInterval(id);
@@ -83,6 +99,19 @@ export default function ActiveWorkoutScreen() {
     Math.round((Date.now() - new Date(activeWorkout.startedAt).getTime()) / 1000),
   );
 
+  const handleSetCheck = (
+    workoutExerciseId: string,
+    setId: string,
+    nextCompleted: boolean,
+    restSeconds: number | undefined,
+  ) => {
+    updateSet(workoutExerciseId, setId, { completed: nextCompleted });
+    if (nextCompleted) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+      restTimer.start(restSeconds ?? DEFAULT_REST_SECONDS);
+    }
+  };
+
   const handleFinish = async () => {
     if (completedSets === 0) {
       Alert.alert(
@@ -99,8 +128,16 @@ export default function ActiveWorkoutScreen() {
   };
 
   const doFinish = async () => {
-    const finished = await finishActiveWorkout();
-    if (finished) {
+    const result = await finishActiveWorkout();
+    restTimer.stop();
+    if (result?.newPRs.length) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      Alert.alert(
+        '🏆 New personal record!',
+        `You set ${result.newPRs.length} new PR${result.newPRs.length === 1 ? '' : 's'} this workout.`,
+      );
+    }
+    if (result) {
       router.replace('/(tabs)');
     } else {
       router.back();
@@ -115,10 +152,21 @@ export default function ActiveWorkoutScreen() {
         style: 'destructive',
         onPress: async () => {
           await discardActiveWorkout();
+          restTimer.stop();
           router.back();
         },
       },
     ]);
+  };
+
+  const handleSaveAsRoutine = async () => {
+    const name = saveRoutineName.trim() || activeWorkout.name;
+    const routine = await saveActiveAsRoutine(name);
+    setSaveSheetOpen(false);
+    setSaveRoutineName('');
+    if (routine) {
+      Alert.alert('Saved', `Routine "${routine.name}" saved.`);
+    }
   };
 
   return (
@@ -164,6 +212,16 @@ export default function ActiveWorkoutScreen() {
               {completedSets} / {totalSets(activeWorkout)}
             </ThemedText>
           </View>
+          <Pressable onPress={() => setSaveSheetOpen(true)} hitSlop={12}>
+            <View style={styles.statBlock}>
+              <ThemedText type="caption" style={styles.statLabel}>
+                ROUTINE
+              </ThemedText>
+              <ThemedText type="body" style={[styles.statValue, { color: Colors.primary.accentViolet }]}>
+                Save as
+              </ThemedText>
+            </View>
+          </Pressable>
         </View>
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -180,10 +238,18 @@ export default function ActiveWorkoutScreen() {
 
           {activeWorkout.exercises.map((workoutExercise) => {
             const exercise = getExerciseById(workoutExercise.exerciseId);
+            const previous = previousSession(workouts, workoutExercise.exerciseId);
+            const previousBest1Rm = bestOneRepMax(workouts, workoutExercise.exerciseId);
+            const restSeconds = workoutExercise.restSeconds ?? DEFAULT_REST_SECONDS;
             return (
               <View key={workoutExercise.id} style={styles.exerciseBlock}>
                 <View style={styles.exerciseHeader}>
-                  <View style={{ flex: 1 }}>
+                  <Pressable
+                    style={{ flex: 1 }}
+                    onPress={() =>
+                      exercise ? router.push(`/exercise/${exercise.id}`) : null
+                    }
+                  >
                     <ThemedText type="h2" style={styles.exerciseName}>
                       {exercise?.name ?? 'Exercise'}
                     </ThemedText>
@@ -192,7 +258,17 @@ export default function ActiveWorkoutScreen() {
                         {exercise.primaryMuscle} · {exercise.equipment}
                       </ThemedText>
                     ) : null}
-                  </View>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => setRestSheetFor(workoutExercise.id)}
+                    hitSlop={8}
+                    style={styles.restPill}
+                  >
+                    <IconSymbol name="clock" size={14} color={Colors.neutral.textPrimary} />
+                    <ThemedText type="caption" style={styles.restPillText}>
+                      {formatRest(restSeconds)}
+                    </ThemedText>
+                  </Pressable>
                   <TouchableOpacity
                     onPress={() =>
                       Alert.alert('Remove exercise?', exercise?.name ?? 'Exercise', [
@@ -205,6 +281,7 @@ export default function ActiveWorkoutScreen() {
                       ])
                     }
                     activeOpacity={0.7}
+                    style={{ marginLeft: Spacing.sm }}
                   >
                     <IconSymbol name="ellipsis" size={22} color={Colors.neutral.textSecondary} />
                   </TouchableOpacity>
@@ -214,10 +291,13 @@ export default function ActiveWorkoutScreen() {
                   <ThemedText type="caption" style={[styles.setHeader, { flex: 0.6 }]}>
                     SET
                   </ThemedText>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1.2 }]}>
+                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1.4 }]}>
+                    PREVIOUS
+                  </ThemedText>
+                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1.1 }]}>
                     KG
                   </ThemedText>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1 }]}>
+                  <ThemedText type="caption" style={[styles.setHeader, { flex: 0.9 }]}>
                     REPS
                   </ThemedText>
                   <ThemedText
@@ -228,70 +308,90 @@ export default function ActiveWorkoutScreen() {
                   </ThemedText>
                 </View>
 
-                {workoutExercise.sets.map((set, index) => (
-                  <View
-                    key={set.id}
-                    style={[
-                      styles.setRow,
-                      set.completed && { backgroundColor: Colors.neutral.elevatedBackground },
-                    ]}
-                  >
-                    <View style={{ flex: 0.6 }}>
-                      <ThemedText type="body" style={styles.setIndex}>
-                        {index + 1}
-                      </ThemedText>
-                    </View>
-                    <TextInput
-                      testID={`set-weight-${workoutExercise.id}-${index}`}
-                      value={set.weight ? String(set.weight) : ''}
-                      onChangeText={(text) =>
-                        updateSet(workoutExercise.id, set.id, {
-                          weight: parseFloat(text.replace(',', '.')) || 0,
-                        })
-                      }
-                      keyboardType="decimal-pad"
-                      placeholder="0"
-                      placeholderTextColor={Colors.neutral.textTertiary}
-                      style={[styles.setInput, { flex: 1.2 }]}
-                    />
-                    <TextInput
-                      testID={`set-reps-${workoutExercise.id}-${index}`}
-                      value={set.reps ? String(set.reps) : ''}
-                      onChangeText={(text) =>
-                        updateSet(workoutExercise.id, set.id, {
-                          reps: parseInt(text, 10) || 0,
-                        })
-                      }
-                      keyboardType="number-pad"
-                      placeholder="0"
-                      placeholderTextColor={Colors.neutral.textTertiary}
-                      style={[styles.setInput, { flex: 1 }]}
-                    />
-                    <View style={{ flex: 0.6, alignItems: 'flex-end' }}>
-                      <TouchableOpacity
-                        testID={`set-check-${workoutExercise.id}-${index}`}
-                        onPress={() =>
-                          updateSet(workoutExercise.id, set.id, { completed: !set.completed })
-                        }
-                        onLongPress={() => removeSet(workoutExercise.id, set.id)}
-                        activeOpacity={0.7}
-                        style={[
-                          styles.checkbox,
-                          set.completed && { backgroundColor: Colors.semantic.success },
-                        ]}
-                      >
-                        {set.completed ? (
-                          <IconSymbol name="checkmark" size={16} color="#fff" />
+                {workoutExercise.sets.map((set, index) => {
+                  const prev = previous[index];
+                  const oneRm = estimateOneRepMax(set.weight, set.reps);
+                  const isPR =
+                    set.completed && oneRm > 0 && oneRm > previousBest1Rm;
+                  return (
+                    <View
+                      key={set.id}
+                      style={[
+                        styles.setRow,
+                        set.completed && { backgroundColor: Colors.neutral.elevatedBackground },
+                      ]}
+                    >
+                      <View style={{ flex: 0.6, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <ThemedText type="body" style={styles.setIndex}>
+                          {index + 1}
+                        </ThemedText>
+                        {isPR ? (
+                          <ThemedText type="caption" style={styles.prBadge} testID={`set-pr-${workoutExercise.id}-${index}`}>
+                            PR
+                          </ThemedText>
                         ) : null}
-                      </TouchableOpacity>
+                      </View>
+                      <ThemedText type="caption" style={[styles.previousText, { flex: 1.4 }]}>
+                        {prev ? `${prev.weight} kg × ${prev.reps}` : '—'}
+                      </ThemedText>
+                      <TextInput
+                        testID={`set-weight-${workoutExercise.id}-${index}`}
+                        value={set.weight ? String(set.weight) : ''}
+                        onChangeText={(text) =>
+                          updateSet(workoutExercise.id, set.id, {
+                            weight: parseFloat(text.replace(',', '.')) || 0,
+                          })
+                        }
+                        keyboardType="decimal-pad"
+                        placeholder={prev ? String(prev.weight) : '0'}
+                        placeholderTextColor={Colors.neutral.textTertiary}
+                        style={[styles.setInput, { flex: 1.1 }]}
+                      />
+                      <TextInput
+                        testID={`set-reps-${workoutExercise.id}-${index}`}
+                        value={set.reps ? String(set.reps) : ''}
+                        onChangeText={(text) =>
+                          updateSet(workoutExercise.id, set.id, {
+                            reps: parseInt(text, 10) || 0,
+                          })
+                        }
+                        keyboardType="number-pad"
+                        placeholder={prev ? String(prev.reps) : '0'}
+                        placeholderTextColor={Colors.neutral.textTertiary}
+                        style={[styles.setInput, { flex: 0.9 }]}
+                      />
+                      <View style={{ flex: 0.6, alignItems: 'flex-end' }}>
+                        <TouchableOpacity
+                          testID={`set-check-${workoutExercise.id}-${index}`}
+                          onPress={() =>
+                            handleSetCheck(
+                              workoutExercise.id,
+                              set.id,
+                              !set.completed,
+                              workoutExercise.restSeconds,
+                            )
+                          }
+                          onLongPress={() => removeSet(workoutExercise.id, set.id)}
+                          activeOpacity={0.7}
+                          style={[
+                            styles.checkbox,
+                            set.completed && { backgroundColor: Colors.semantic.success },
+                          ]}
+                        >
+                          {set.completed ? (
+                            <IconSymbol name="checkmark" size={16} color="#fff" />
+                          ) : null}
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                  </View>
-                ))}
+                  );
+                })}
 
                 <TouchableOpacity
                   style={styles.addSetButton}
                   activeOpacity={0.7}
                   onPress={() => addSetToExercise(workoutExercise.id)}
+                  testID={`add-set-${workoutExercise.id}`}
                 >
                   <IconSymbol name="plus" size={18} color={Colors.primary.accentViolet} />
                   <ThemedText type="body" style={styles.addSetText}>
@@ -323,6 +423,83 @@ export default function ActiveWorkoutScreen() {
           />
         </ScrollView>
       </SafeAreaView>
+
+      <RestTimerOverlay />
+
+      {/* Rest seconds picker */}
+      <Modal
+        visible={restSheetFor !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRestSheetFor(null)}
+      >
+        <Pressable style={styles.backdrop} onPress={() => setRestSheetFor(null)}>
+          <View style={styles.sheet} onStartShouldSetResponder={() => true}>
+            <ThemedText type="h2" style={styles.sheetTitle}>
+              Rest timer
+            </ThemedText>
+            <View style={styles.restGrid}>
+              {REST_PRESETS.map((seconds) => (
+                <Pressable
+                  key={seconds}
+                  onPress={() => {
+                    if (restSheetFor) setExerciseRest(restSheetFor, seconds);
+                    setRestSheetFor(null);
+                  }}
+                  style={styles.restOption}
+                  testID={`rest-option-${seconds}`}
+                >
+                  <ThemedText type="body" style={styles.restOptionText}>
+                    {formatRest(seconds)}
+                  </ThemedText>
+                </Pressable>
+              ))}
+            </View>
+            <Pressable
+              onPress={() => {
+                if (restSheetFor) setExerciseRest(restSheetFor, undefined);
+                setRestSheetFor(null);
+              }}
+              style={[styles.restOption, { backgroundColor: 'transparent' }]}
+            >
+              <ThemedText type="caption" style={{ color: Colors.semantic.error }}>
+                Disable rest timer
+              </ThemedText>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* Save as routine sheet */}
+      <Modal
+        visible={saveSheetOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSaveSheetOpen(false)}
+      >
+        <Pressable style={styles.backdrop} onPress={() => setSaveSheetOpen(false)}>
+          <View style={styles.sheet} onStartShouldSetResponder={() => true}>
+            <ThemedText type="h2" style={styles.sheetTitle}>
+              Save as routine
+            </ThemedText>
+            <TextInput
+              testID="save-routine-name"
+              value={saveRoutineName}
+              onChangeText={setSaveRoutineName}
+              placeholder={activeWorkout.name}
+              placeholderTextColor={Colors.neutral.textTertiary}
+              style={styles.sheetInput}
+            />
+            <Button
+              testID="save-routine-confirm"
+              title="Save"
+              onPress={handleSaveAsRoutine}
+              variant="primary"
+              fullWidth
+            />
+          </View>
+        </Pressable>
+      </Modal>
     </ThemedView>
   );
 }
@@ -337,6 +514,15 @@ function formatTimer(seconds: number) {
 
 function pad(n: number) {
   return String(n).padStart(2, '0');
+}
+
+function formatRest(seconds: number) {
+  if (!seconds) return 'Off';
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  if (s === 0) return `${m}m`;
+  if (m === 0) return `${s}s`;
+  return `${m}m ${s}s`;
 }
 
 const styles = StyleSheet.create({
@@ -363,7 +549,7 @@ const styles = StyleSheet.create({
   statBlock: { flex: 1 },
   statLabel: { color: Colors.neutral.textSecondary },
   statValue: { color: Colors.neutral.textPrimary, fontWeight: '600' },
-  content: { padding: Spacing.md, paddingBottom: Spacing.xxl },
+  content: { padding: Spacing.md, paddingBottom: 140 },
   nameInput: {
     color: Colors.neutral.textPrimary,
     fontSize: 22,
@@ -380,6 +566,16 @@ const styles = StyleSheet.create({
   exerciseHeader: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: Spacing.sm },
   exerciseName: { color: Colors.primary.accentViolet },
   exerciseMeta: { color: Colors.neutral.textSecondary, marginTop: 2 },
+  restPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: Colors.neutral.elevatedBackground,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+  },
+  restPillText: { color: Colors.neutral.textPrimary },
   setHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -400,6 +596,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   setIndex: { color: Colors.neutral.textPrimary, fontWeight: '600' },
+  previousText: { color: Colors.neutral.textTertiary },
+  prBadge: {
+    color: Colors.semantic.pr,
+    fontWeight: '700',
+    fontSize: 10,
+    backgroundColor: 'rgba(255,176,32,0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
   setInput: {
     color: Colors.neutral.textPrimary,
     fontSize: 16,
@@ -438,4 +644,33 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
   },
   emptyTitle: { color: Colors.neutral.textPrimary },
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: Colors.neutral.cardBackground,
+    padding: Spacing.lg,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    gap: Spacing.md,
+  },
+  sheetTitle: { color: Colors.neutral.textPrimary },
+  sheetInput: {
+    color: Colors.neutral.textPrimary,
+    fontSize: 18,
+    backgroundColor: Colors.neutral.elevatedBackground,
+    borderRadius: 12,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+  },
+  restGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+  restOption: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    backgroundColor: Colors.neutral.elevatedBackground,
+    borderRadius: 999,
+  },
+  restOptionText: { color: Colors.neutral.textPrimary },
 });
