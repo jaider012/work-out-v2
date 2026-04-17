@@ -1,0 +1,47 @@
+# Verify the post-finish celebration screen renders after a completed workout.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+
+- tapOn:
+    text: "Workout"
+- tapOn:
+    id: "workout-quick-start"
+
+- tapOn:
+    id: "active-workout-add-exercise"
+- tapOn:
+    id: "exercise-picker-search"
+- inputText: "Bench"
+- hideKeyboard
+- tapOn:
+    id: "exercise-row-bench-press"
+- tapOn:
+    id: "exercise-picker-add"
+
+# Log one set so the finish is not empty.
+- tapOn:
+    text: "0"
+    index: 0
+- inputText: "60"
+- hideKeyboard
+- tapOn:
+    text: "0"
+    index: 0
+- inputText: "8"
+- hideKeyboard
+- tapOn:
+    text: "✓"
+    index: 0
+    optional: true
+
+- tapOn:
+    id: "active-workout-finish"
+
+- assertVisible: "Great work!"
+- assertVisible:
+    id: "workout-complete-share"
+- assertVisible:
+    id: "workout-complete-done"
+- tapOn:
+    id: "workout-complete-done"

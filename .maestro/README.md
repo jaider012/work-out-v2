@@ -43,6 +43,7 @@ Android emulator, or physical device.
 | `14_steppers_and_clear.yaml` | Weight steppers, activity strip, Settings → Clear data button. |
 | `15_routine_search_and_quick_links.yaml` | Routine search, Home quick routines and exercise CTA. |
 | `16_routine_preview.yaml` | Routine preview sheet renders and starts the workout. |
+| `17_workout_complete.yaml` | Post-finish celebration screen with share + done actions. |
 
 Run them all in order:
 

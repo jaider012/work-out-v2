@@ -24,3 +24,4 @@ executionOrder:
     - 14_steppers_and_clear.yaml
     - 15_routine_search_and_quick_links.yaml
     - 16_routine_preview.yaml
+    - 17_workout_complete.yaml

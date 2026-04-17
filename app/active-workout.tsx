@@ -199,13 +199,12 @@ export default function ActiveWorkoutScreen() {
     restTimer.stop();
     if (result?.newPRs.length) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      Alert.alert(
-        '🏆 New personal record!',
-        `You set ${result.newPRs.length} new PR${result.newPRs.length === 1 ? '' : 's'} this workout.`,
-      );
     }
     if (result) {
-      router.replace('/(tabs)');
+      router.replace({
+        pathname: '/workout-complete',
+        params: { id: result.workout.id, prs: String(result.newPRs.length) },
+      });
     } else {
       router.back();
     }

@@ -86,6 +86,10 @@ function RootLayoutNav() {
           name="personal-records"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="workout-complete"
+          options={{ presentation: 'modal', headerShown: false, gestureEnabled: false }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />
