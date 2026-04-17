@@ -22,6 +22,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
 import { DEFAULT_REST_SECONDS, useWorkouts } from '@/contexts/WorkoutContext';
+import { useMeasurements } from '@/contexts/MeasurementsContext';
 import { useRestTimer } from '@/contexts/RestTimerContext';
 import { fromKg, toKg, useSettings } from '@/contexts/SettingsContext';
 import { getExerciseById } from '@/data/exercises';
@@ -93,6 +94,8 @@ export default function ActiveWorkoutScreen() {
   } = useWorkouts();
   const restTimer = useRestTimer();
   const { weightUnit } = useSettings();
+  const { measurements } = useMeasurements();
+  const latestBodyWeightKg = measurements[0]?.weightKg ?? 0;
 
   const [, force] = useState(0);
   const [restSheetFor, setRestSheetFor] = useState<string | null>(null);
@@ -296,7 +299,12 @@ export default function ActiveWorkoutScreen() {
           </Pressable>
         </View>
 
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
           <TextInput
             testID="active-workout-name"
             value={activeWorkout.name}
@@ -548,7 +556,13 @@ export default function ActiveWorkoutScreen() {
                             });
                           }}
                           keyboardType="decimal-pad"
-                          placeholder={prev ? String(fromKg(prev.weight, weightUnit)) : '0'}
+                          placeholder={
+                            prev
+                              ? String(fromKg(prev.weight, weightUnit))
+                              : exercise?.equipment === 'bodyweight' && latestBodyWeightKg
+                                ? String(fromKg(latestBodyWeightKg, weightUnit))
+                                : '0'
+                          }
                           placeholderTextColor={Colors.neutral.textTertiary}
                           style={[styles.setInput, { flex: 1, marginRight: 0 }]}
                         />

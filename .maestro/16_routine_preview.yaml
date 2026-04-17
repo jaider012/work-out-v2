@@ -1,0 +1,25 @@
+# Confirm the routine preview sheet and the "Edit routine" link work.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+- tapOn:
+    text: "Workout"
+- tapOn:
+    text: "Push Day"
+
+# Preview should render with exercises + start button.
+- assertVisible: "Push Day"
+- assertVisible: "EXERCISES"
+- assertVisible:
+    id: "routine-preview-edit"
+- assertVisible:
+    id: "routine-preview-start"
+- tapOn:
+    id: "routine-preview-start"
+- assertVisible:
+    id: "active-workout-name"
+- tapOn:
+    id: "active-workout-discard"
+- tapOn:
+    text: "Discard"
+    optional: true

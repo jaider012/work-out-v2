@@ -23,3 +23,4 @@ executionOrder:
     - 13_supersets_and_plates.yaml
     - 14_steppers_and_clear.yaml
     - 15_routine_search_and_quick_links.yaml
+    - 16_routine_preview.yaml

@@ -200,7 +200,7 @@ export default function WorkoutScreen() {
                         .map((ex) => getExerciseById(ex.exerciseId)?.name ?? 'Exercise')
                         .filter(Boolean)}
                       onStart={() => handleStartRoutine(routine.id)}
-                      onPress={() => router.push(`/routine/${routine.id}`)}
+                      onPress={() => router.push(`/routine/preview/${routine.id}`)}
                       onLongPress={() => onRoutineLongPress(routine.id, routine.name)}
                     />
                   ))}
@@ -270,7 +270,7 @@ export default function WorkoutScreen() {
                     .map((ex) => getExerciseById(ex.exerciseId)?.name ?? 'Exercise')
                     .filter(Boolean)}
                   onStart={() => handleStartRoutine(routine.id)}
-                  onPress={() => router.push(`/routine/${routine.id}`)}
+                  onPress={() => router.push(`/routine/preview/${routine.id}`)}
                   onLongPress={() => onRoutineLongPress(routine.id, routine.name)}
                 />
               ))}

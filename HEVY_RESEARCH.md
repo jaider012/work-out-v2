@@ -139,7 +139,20 @@ yarn e2e:flow .maestro/02_quick_start_workout.yaml
 APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 ```
 
-## 5. Hevy-parity features — iteration 9 update
+## 5. Hevy-parity features — iteration 10 update
+
+- ✅ **Routine preview** sheet (`/routine/preview/[id]`): tap a routine in
+  the Workout tab and you see its exercise list + sets before starting.
+  The preview includes an edit shortcut.
+- ✅ **Bodyweight auto-fill**: bodyweight exercises now show the user's
+  latest body measurement as the weight placeholder so pull-ups, dips and
+  plank inputs don't start blank.
+- ✅ The active-workout scroll view now dismisses the keyboard on drag and
+  keeps taps on buttons responsive.
+- ✅ **Jest unit tests** (`yarn test`) cover the plate calculator, streak
+  logic and PR detection — 19 tests, all green.
+
+## 6. Hevy-parity features — iteration 9 update
 
 - ✅ **Routine search** on the Workout tab — matches both routine names
   and the exercises they contain.
@@ -152,7 +165,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ Empty states polished (Workout tab now shows a dedicated card when
   search has no matches or the user has no routines yet).
 
-## 6. Hevy-parity features — iteration 8 update
+## 7. Hevy-parity features — iteration 8 update
 
 - ✅ **Plate calculator in lbs**: the sheet now picks the right plate set
   (kg: 25/20/15/10/5/2.5/1.25 · lbs: 45/35/25/10/5/2.5/1.25) and the bar
@@ -164,7 +177,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ "Danger zone" **Clear all data** button in Settings (wipes workouts,
   routines, folders and measurements).
 
-## 7. Hevy-parity features — iteration 7 update
+## 8. Hevy-parity features — iteration 7 update
 
 - ✅ **Supersets**: Create / Break superset lives in the exercise action
   menu. Grouped exercises share a letter badge (A, B, C…) and a violet
@@ -176,7 +189,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
   the Profile tab. Sorted by estimated 1 RM, each row deep-links into the
   exercise detail page.
 
-## 8. Hevy-parity features — iteration 6 update
+## 9. Hevy-parity features — iteration 6 update
 
 - ✅ **Workout notes** field (multiline) at the top of the active workout,
   saved with the finished workout.
@@ -189,7 +202,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ **JSON import** from Settings: pick a previously exported file and
   restore workouts + routines + folders (kept alongside the new Export).
 
-## 9. Hevy-parity features — iteration 5 update
+## 10. Hevy-parity features — iteration 5 update
 
 - ✅ Persistent **active workout banner** floats above the tab bar on every
   tab screen. Shows workout name, live elapsed timer and deep-links into the
@@ -204,7 +217,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ **JSON export** from Settings (uses `expo-file-system` + `expo-sharing`)
   to back up workouts, routines, folders and body measurements.
 
-## 10. Hevy-parity features — iteration 4 update
+## 11. Hevy-parity features — iteration 4 update
 
 - ✅ Per-set type badge (Normal / Warmup / Failure / Drop) – tap to cycle
   through states, mirrors Hevy's W / F / D markers. Warmups are excluded
@@ -217,7 +230,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ Active workout header now shows "LAST" — how long ago the last workout
   was logged — alongside volume and sets.
 
-## 11. Hevy-parity features — iteration 3 update
+## 12. Hevy-parity features — iteration 3 update
 
 - ✅ Weight unit preference (kg / lbs) stored in `SettingsContext`, applied to
   every screen that shows volume / weight (home feed, history, profile,
@@ -231,7 +244,7 @@ APP_ID=com.yourorg.workoutv2 yarn e2e   # against a development build
 - ✅ Settings modal at `/settings` (weight unit toggle + about).
 - ✅ Profile cards now deep-link to Body Measurements and App Settings.
 
-## 12. Hevy-parity features — earlier iterations
+## 13. Hevy-parity features — earlier iterations
 
 - ✅ Routine editor (create / edit / delete, folder picker, ad-hoc folder
   creation) reachable from the Workout tab and via long-press on a routine.

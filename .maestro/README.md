@@ -42,6 +42,7 @@ Android emulator, or physical device.
 | `13_supersets_and_plates.yaml` | Superset creation menu, plate calculator sheet, PR list screen. |
 | `14_steppers_and_clear.yaml` | Weight steppers, activity strip, Settings → Clear data button. |
 | `15_routine_search_and_quick_links.yaml` | Routine search, Home quick routines and exercise CTA. |
+| `16_routine_preview.yaml` | Routine preview sheet renders and starts the workout. |
 
 Run them all in order:
 
