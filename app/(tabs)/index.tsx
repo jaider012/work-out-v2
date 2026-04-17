@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -20,7 +20,7 @@ import { computeWorkoutVolumeKg } from '@/utils/workoutStats';
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const { workouts, activeWorkout, startEmptyWorkout } = useWorkouts();
+  const { workouts, activeWorkout, startEmptyWorkout, routines, startRoutine } = useWorkouts();
   const { weightUnit } = useSettings();
 
   const recent = useMemo(() => workouts.slice(0, 5), [workouts]);
@@ -51,6 +51,17 @@ export default function HomeScreen() {
     if (!activeWorkout) startEmptyWorkout();
     router.push('/active-workout');
   };
+
+  const handleStartRoutine = (routineId: string) => {
+    if (activeWorkout) {
+      router.push('/active-workout');
+      return;
+    }
+    startRoutine(routineId);
+    router.push('/active-workout');
+  };
+
+  const quickRoutines = useMemo(() => routines.slice(0, 3), [routines]);
 
   const greeting = user?.email?.split('@')[0] ?? 'Athlete';
 
@@ -118,6 +129,36 @@ export default function HomeScreen() {
               />
             </Card>
           )}
+
+          {quickRoutines.length > 0 ? (
+            <View style={styles.section}>
+              <ThemedText type="caption" style={styles.sectionTitle}>
+                JUMP BACK IN
+              </ThemedText>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: Spacing.sm }}
+              >
+                {quickRoutines.map((routine) => (
+                  <Pressable
+                    key={routine.id}
+                    onPress={() => handleStartRoutine(routine.id)}
+                    style={styles.quickRoutineCard}
+                    testID={`home-routine-${routine.id}`}
+                  >
+                    <IconSymbol name="play.fill" size={18} color={Colors.primary.accentViolet} />
+                    <ThemedText type="body" style={styles.quickRoutineName} numberOfLines={1}>
+                      {routine.name}
+                    </ThemedText>
+                    <ThemedText type="caption" style={styles.quickRoutineMeta}>
+                      {routine.exercises.length} exercises
+                    </ThemedText>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+          ) : null}
 
           <View style={styles.activityStrip}>
             {weekActivity.map((entry, idx) => (
@@ -298,6 +339,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.neutral.elevatedBackground,
   },
   activityLabel: { color: Colors.neutral.textSecondary },
+  quickRoutineCard: {
+    width: 180,
+    backgroundColor: Colors.neutral.cardBackground,
+    borderRadius: 12,
+    padding: Spacing.md,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: Colors.neutral.border,
+  },
+  quickRoutineName: { color: Colors.neutral.textPrimary, fontWeight: '600' },
+  quickRoutineMeta: { color: Colors.neutral.textSecondary },
   startCard: { marginBottom: Spacing.lg },
   startTitle: { color: Colors.neutral.textPrimary, marginBottom: Spacing.xs },
   startSubtitle: { color: Colors.neutral.textSecondary },

@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
+import { Button } from '@/components/ui/Button';
 import { Sparkline } from '@/components/Sparkline';
 import { fromKg, useSettings } from '@/contexts/SettingsContext';
 import { useWorkouts } from '@/contexts/WorkoutContext';
@@ -23,9 +24,24 @@ import {
 export default function ExerciseDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { workouts } = useWorkouts();
+  const {
+    workouts,
+    activeWorkout,
+    startEmptyWorkout,
+    addExercisesToActive,
+  } = useWorkouts();
   const { weightUnit } = useSettings();
   const exercise = id ? getExerciseById(id) : undefined;
+
+  const handleStartWithExercise = () => {
+    if (!id) return;
+    if (!activeWorkout) startEmptyWorkout();
+    // Defer the add so startEmptyWorkout has a chance to commit state.
+    setTimeout(() => {
+      addExercisesToActive([id]);
+      router.push('/active-workout');
+    }, 0);
+  };
 
   const sessions = useMemo(() => {
     if (!id) return [] as { startedAt: string; workoutId: string; sets: { weight: number; reps: number }[] }[];
@@ -97,6 +113,15 @@ export default function ExerciseDetailScreen() {
           <ThemedText type="caption" style={styles.meta}>
             {MUSCLE_LABELS[exercise.primaryMuscle]} · {EQUIPMENT_LABELS[exercise.equipment]}
           </ThemedText>
+
+          <Button
+            testID="exercise-detail-start"
+            title={activeWorkout ? 'Add to current workout' : 'Start workout with this exercise'}
+            variant="primary"
+            fullWidth
+            onPress={handleStartWithExercise}
+            style={{ marginBottom: Spacing.lg }}
+          />
 
           <Card style={styles.statsCard}>
             <Stat label="Sessions" value={String(sessions.length)} />

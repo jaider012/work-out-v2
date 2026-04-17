@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -27,6 +27,7 @@ export default function WorkoutScreen() {
     saveRoutine,
   } = useWorkouts();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [search, setSearch] = useState('');
 
   const onRoutineLongPress = (routineId: string, name: string) => {
     Alert.alert(name, 'Routine actions', [
@@ -55,15 +56,27 @@ export default function WorkoutScreen() {
     ]);
   };
 
+  const filteredRoutines = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return routines;
+    return routines.filter((r) => {
+      if (r.name.toLowerCase().includes(term)) return true;
+      return r.exercises.some((ex) => {
+        const name = getExerciseById(ex.exerciseId)?.name ?? '';
+        return name.toLowerCase().includes(term);
+      });
+    });
+  }, [routines, search]);
+
   const grouped = useMemo(() => {
     const map = new Map<string | undefined, typeof routines>();
-    for (const r of routines) {
+    for (const r of filteredRoutines) {
       const list = map.get(r.folderId) ?? [];
       list.push(r);
       map.set(r.folderId, list);
     }
     return map;
-  }, [routines]);
+  }, [filteredRoutines]);
 
   const handleStartEmpty = () => {
     if (!activeWorkout) startEmptyWorkout();
@@ -128,6 +141,32 @@ export default function WorkoutScreen() {
               </ThemedText>
             </TouchableOpacity>
           </View>
+
+          <View style={styles.searchRow}>
+            <IconSymbol name="magnifyingglass" size={16} color={Colors.neutral.textSecondary} />
+            <TextInput
+              testID="workout-search"
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Search routines or exercises"
+              placeholderTextColor={Colors.neutral.textTertiary}
+              style={styles.searchInput}
+            />
+          </View>
+
+          {filteredRoutines.length === 0 ? (
+            <Card style={styles.emptyCard}>
+              <IconSymbol name="folder.fill" size={32} color={Colors.neutral.textTertiary} />
+              <ThemedText type="body" style={styles.emptyTitle}>
+                {search ? 'No routines match your search' : 'No routines yet'}
+              </ThemedText>
+              <ThemedText type="caption" style={styles.routinePreview}>
+                {search
+                  ? 'Try a different exercise or routine name.'
+                  : 'Create one above or copy a Discover routine below.'}
+              </ThemedText>
+            </Card>
+          ) : null}
 
           {folders.map((folder) => {
             const folderRoutines = grouped.get(folder.id) ?? [];
@@ -352,4 +391,21 @@ const styles = StyleSheet.create({
   discoverTitle: { color: Colors.neutral.textPrimary, fontWeight: '700' },
   discoverDescription: { color: Colors.neutral.textSecondary, minHeight: 48 },
   discoverMeta: { color: Colors.neutral.textTertiary, marginBottom: Spacing.xs },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.neutral.cardBackground,
+    borderRadius: 10,
+    paddingHorizontal: Spacing.sm,
+    marginBottom: Spacing.md,
+    gap: Spacing.xs,
+  },
+  searchInput: { flex: 1, color: Colors.neutral.textPrimary, paddingVertical: Spacing.sm },
+  emptyCard: {
+    alignItems: 'center',
+    padding: Spacing.xl,
+    gap: Spacing.xs,
+    marginBottom: Spacing.lg,
+  },
+  emptyTitle: { color: Colors.neutral.textPrimary },
 });
