@@ -43,6 +43,7 @@ export default function WelcomeScreen() {
         {/* CTA Section */}
         <View style={styles.ctaSection}>
           <Button
+            testID="welcome-get-started"
             title="Get Started"
             onPress={handleGetStarted}
             variant="primary"
@@ -50,8 +51,9 @@ export default function WelcomeScreen() {
             fullWidth
             style={styles.primaryButton}
           />
-          
+
           <Button
+            testID="welcome-sign-in"
             title="I already have an account"
             onPress={handleSignIn}
             variant="outline"

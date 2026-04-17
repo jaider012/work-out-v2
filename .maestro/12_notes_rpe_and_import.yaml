@@ -1,0 +1,48 @@
+# Adds workout notes, cycles RPE, and smoke-tests the Import button on settings.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+- tapOn:
+    text: "Workout"
+- tapOn:
+    id: "workout-quick-start"
+
+# Workout notes
+- assertVisible:
+    id: "active-workout-notes"
+- tapOn:
+    id: "active-workout-notes"
+- inputText: "Felt strong today"
+- hideKeyboard
+
+# Add exercise for RPE tapping
+- tapOn:
+    id: "active-workout-add-exercise"
+- tapOn:
+    id: "exercise-picker-search"
+- inputText: "Bench"
+- hideKeyboard
+- tapOn:
+    id: "exercise-row-bench-press"
+- tapOn:
+    id: "exercise-picker-add"
+
+- tapOn:
+    id: "set-rpe-${output.we ?? 'we-0'}-0"
+    optional: true
+
+- tapOn:
+    id: "active-workout-discard"
+- tapOn:
+    text: "Discard"
+    optional: true
+
+# Settings → Import button visible
+- tapOn:
+    text: "Profile"
+- tapOn:
+    text: "App Settings"
+- assertVisible:
+    id: "settings-export"
+- assertVisible:
+    id: "settings-import"

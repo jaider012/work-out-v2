@@ -1,0 +1,51 @@
+# Exercise the superset menu and the plate calculator button.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+- tapOn:
+    text: "Workout"
+- tapOn:
+    id: "workout-quick-start"
+
+# Add two exercises so supersets are available.
+- tapOn:
+    id: "active-workout-add-exercise"
+- tapOn:
+    id: "exercise-picker-search"
+- inputText: "Bench"
+- hideKeyboard
+- tapOn:
+    id: "exercise-row-bench-press"
+- tapOn:
+    id: "exercise-picker-add"
+
+- tapOn:
+    id: "active-workout-add-exercise"
+- tapOn:
+    id: "exercise-picker-search"
+- inputText: "Row"
+- hideKeyboard
+- tapOn:
+    id: "exercise-row-barbell-row"
+- tapOn:
+    id: "exercise-picker-add"
+
+# Plate calculator button should appear for the barbell exercise.
+- assertVisible:
+    text: "Plates"
+- tapOn:
+    text: "Plates"
+- assertVisible: "Plate calculator"
+
+- tapOn:
+    id: "active-workout-discard"
+- tapOn:
+    text: "Discard"
+    optional: true
+
+# Personal Records entry on Profile
+- tapOn:
+    text: "Profile"
+- tapOn:
+    text: "Personal Records"
+- assertVisible: "Personal Records"

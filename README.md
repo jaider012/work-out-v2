@@ -1,53 +1,93 @@
-> Edited for use in IDX on 07/09/12
+# work-out-v2 — Hevy-style workout tracker
 
-# Welcome to your Expo app 👋
+A React Native / Expo SDK 55 workout tracker inspired by
+[Hevy](https://www.hevyapp.com/). Every core flow Hevy ships — logging a
+workout, routines in folders, rest timer, PR detection, body measurements,
+calendar history, per-exercise charts — is implemented locally with
+AsyncStorage persistence.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Stack
 
-## Get started
+- **Expo SDK 55** (`expo` `55.0.15`, React Native 0.83, React 19.2)
+- **expo-router** v55 with typed routes
+- **AsyncStorage** for offline-first data
+- **expo-file-system** + **expo-sharing** for JSON export / import
+- **expo-haptics** for rest-timer / PR haptics
+- **Firebase Auth** for the email sign-in flow
+- **jest-expo** for unit tests, **Maestro** for E2E flows
 
-#### Android
-
-Android previews are defined as a `workspace.onStart` hook and started as a vscode task when the workspace is opened/started.
-
-Note, if you can't find the task, either:
-- Rebuild the environment (using command palette: `IDX: Rebuild Environment`), or
-- Run `npm run android -- --tunnel` command manually run android and see the output in your terminal. The device should pick up this new command and switch to start displaying the output from it.
-
-In the output of this command/task, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You'll also find options to open the app's developer menu, reload the app, and more.
-
-#### Web
-
-Web previews will be started and managred automatically. Use the toolbar to manually refresh.
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Scripts
 
 ```bash
-npm run reset-project
+yarn start          # expo start
+yarn ios            # expo start --ios
+yarn android        # expo start --android
+yarn web            # expo start --web
+yarn lint           # expo lint
+yarn test           # jest (utilities unit tests)
+yarn e2e            # run every Maestro flow
+yarn e2e:flow .maestro/02_quick_start_workout.yaml   # single flow
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Feature map (Hevy parity)
 
-## Learn more
+| Surface | What's in the clone |
+| --- | --- |
+| Tabs | Home · Workout · History · Profile (same as Hevy's Home / Workout / History / Profile) |
+| Home | Welcome header + streak chip, 7-day activity strip, "Jump back in" routines, workout feed |
+| Workout | Quick Start, routine search, folders with collapse, Discover carousel, long-press actions |
+| Routine editor | Name, folder picker (with ad-hoc folder creation), exercise picker integration, reorder chevrons |
+| Routine preview | Pre-start sheet with exercise list + planned sets + Edit shortcut |
+| Active workout | Live timer, volume / sets / last-workout header, workout notes, per-exercise notes, superset letters, rest timer, plate calculator (kg/lbs), set type badge (N/W/F/D), RPE cycler, previous values per set, bodyweight auto-fill, +/- weight steppers, PR badge, Finish / Save as routine / Discard |
+| Exercise library | 35+ exercises, muscle + equipment filters, search, multi-select picker |
+| Exercise detail | Sessions / sets / best e1RM stats, heaviest set card, e1RM sparkline, per-session history, "Start workout" CTA |
+| History | Full month calendar with violet dots + today ring, month/day filtering, long-press delete |
+| Past workout detail | Per-set breakdown, Repeat Workout CTA |
+| Profile | Stats grid (workouts / streak / week / sets / PRs / volume), weekly-volume sparkline, muscle distribution, main exercises, browse all exercises sheet |
+| Personal Records | Dedicated `/personal-records` list sorted by e1RM |
+| Body measurements | Log weight, sparkline, history list, delta vs previous |
+| Settings | KG / LBS toggle, JSON export, JSON import, Clear all data |
+| Persistent banner | Floating "Workout in progress" bar above every tab |
+| Workout complete | Post-finish celebration screen with PR banner + share summary |
 
-To learn more about developing your project with Expo, look at the following resources:
+See [HEVY_RESEARCH.md](./HEVY_RESEARCH.md) for the research notes and a
+per-iteration changelog.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Project layout
 
-## Join the community
+```
+app/                    # expo-router screens
+  (auth)/               # welcome, sign-in, sign-up
+  (tabs)/               # Home, Workout, History, Profile
+  active-workout.tsx    # logging modal
+  workout-complete.tsx  # post-finish summary
+  exercise-picker.tsx   # picker modal
+  routine/new.tsx
+  routine/[id].tsx      # edit
+  routine/preview/[id]  # preview-before-start
+  workout/[id].tsx
+  exercise/[id].tsx
+  measurements.tsx
+  personal-records.tsx
+  settings.tsx
+components/             # shared UI (Card, Button, Sparkline, MonthCalendar, …)
+contexts/               # WorkoutContext, SettingsContext, MeasurementsContext,
+                        # RestTimerContext, ExercisePickerBus, AuthContext
+data/                   # exercises, starter routines, discover routines
+types/                  # Exercise, Workout, Routine, BodyMeasurement
+utils/                  # stats, streak, exercise history, plate calculator
+.maestro/               # 16 Maestro E2E flows
+utils/__tests__         # jest unit tests
+```
 
-Join our community of developers creating universal apps.
+## End-to-end testing
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Sixteen Maestro YAML flows cover every major user journey. See
+[.maestro/README.md](./.maestro/README.md) for how to run them against
+Expo Go or a development build.
+
+## Upgrading from Expo SDK 53
+
+Historical context for the SDK 53 → 55 migration performed on this
+repository is documented in
+[HEVY_RESEARCH.md §2](./HEVY_RESEARCH.md#2-expo-sdk-upgrade-53--55).

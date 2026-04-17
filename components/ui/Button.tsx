@@ -23,6 +23,7 @@ interface ButtonProps {
   fullWidth?: boolean;
   style?: ViewStyle;
   icon?: React.ReactNode;
+  testID?: string;
 }
 
 export function Button({
@@ -35,6 +36,7 @@ export function Button({
   fullWidth = false,
   style,
   icon,
+  testID,
 }: ButtonProps) {
   const getButtonStyle = (): ViewStyle[] => {
     const baseStyle: ViewStyle[] = [styles.button, styles[size]];
@@ -88,6 +90,8 @@ export function Button({
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.8}
+      testID={testID}
+      accessibilityLabel={testID ?? title}
     >
       <View style={styles.content}>
         {loading ? (

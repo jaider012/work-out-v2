@@ -1,0 +1,49 @@
+# Create a brand-new routine from the Workout tab and start it.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+- tapOn:
+    text: "Workout"
+- assertVisible:
+    id: "workout-new-routine"
+- tapOn:
+    id: "workout-new-routine"
+
+# Routine editor opens
+- assertVisible: "New Routine"
+- tapOn:
+    id: "routine-name"
+- inputText: "Maestro PPL Push"
+- hideKeyboard
+
+# Add exercises
+- tapOn:
+    id: "routine-add-exercise"
+- assertVisible:
+    id: "exercise-picker-search"
+- tapOn:
+    id: "exercise-picker-search"
+- inputText: "Bench"
+- hideKeyboard
+- tapOn:
+    id: "exercise-row-bench-press"
+- tapOn:
+    id: "exercise-picker-search"
+- eraseText: 20
+- inputText: "Overhead"
+- hideKeyboard
+- tapOn:
+    id: "exercise-row-overhead-press"
+- tapOn:
+    id: "exercise-picker-add"
+
+# Save routine
+- assertVisible: "Bench Press (Barbell)"
+- assertVisible: "Overhead Press (Barbell)"
+- tapOn:
+    id: "routine-save"
+
+# Verify routine appears in the workout tab list
+- assertVisible:
+    text: "Maestro PPL Push"
+    timeout: 5000

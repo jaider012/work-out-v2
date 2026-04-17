@@ -1,0 +1,15 @@
+# Toggle weight unit in Settings and verify the change persists.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+- tapOn:
+    text: "Profile"
+- tapOn:
+    text: "App Settings"
+- assertVisible:
+    id: "settings-unit-kg"
+- tapOn:
+    id: "settings-unit-lbs"
+- assertVisible: "LBS"
+- tapOn:
+    id: "settings-unit-kg"

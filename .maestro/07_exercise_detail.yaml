@@ -1,0 +1,16 @@
+# Open the Exercises browser from the Profile tab and inspect a movement.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+- tapOn:
+    text: "Profile"
+- assertVisible:
+    id: "profile-browse-exercises"
+- tapOn:
+    id: "profile-browse-exercises"
+- assertVisible: "Exercises"
+- tapOn:
+    text: "Bench Press (Barbell)"
+
+- assertVisible: "HEAVIEST SET"
+- assertVisible: "HISTORY"

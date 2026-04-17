@@ -79,6 +79,7 @@ export default function SignInScreen() {
                     EMAIL ADDRESS
                   </ThemedText>
                   <TextInput
+                    testID="sign-in-email"
                     style={styles.input}
                     placeholder="Enter your email"
                     placeholderTextColor={Colors.neutral.textTertiary}
@@ -95,6 +96,7 @@ export default function SignInScreen() {
                     PASSWORD
                   </ThemedText>
                   <TextInput
+                    testID="sign-in-password"
                     style={styles.input}
                     placeholder="Enter your password"
                     placeholderTextColor={Colors.neutral.textTertiary}
@@ -107,6 +109,7 @@ export default function SignInScreen() {
                 </View>
 
                 <Button
+                  testID="sign-in-submit"
                   title="Sign In"
                   onPress={handleSignIn}
                   variant="primary"

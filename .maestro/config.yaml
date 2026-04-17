@@ -1,0 +1,27 @@
+# Shared configuration for the Maestro flows.
+# Override APP_ID via environment variable when launching:
+#   APP_ID=com.yourorg.workoutv2 maestro test .maestro/quick-start-workout.yaml
+appId: ${APP_ID:-host.exp.Exponent}
+---
+# Default executionOrder: run flows alphabetically by filename so the auth flow
+# runs first. Override per-CI by passing individual flow files.
+executionOrder:
+  continueOnFailure: false
+  flowsOrder:
+    - 01_sign_in.yaml
+    - 02_quick_start_workout.yaml
+    - 03_routine_workout.yaml
+    - 04_history_review.yaml
+    - 05_create_routine.yaml
+    - 06_rest_timer_and_pr.yaml
+    - 07_exercise_detail.yaml
+    - 08_settings_unit_toggle.yaml
+    - 09_body_measurements.yaml
+    - 10_set_types_and_calendar.yaml
+    - 11_banner_and_repeat.yaml
+    - 12_notes_rpe_and_import.yaml
+    - 13_supersets_and_plates.yaml
+    - 14_steppers_and_clear.yaml
+    - 15_routine_search_and_quick_links.yaml
+    - 16_routine_preview.yaml
+    - 17_workout_complete.yaml

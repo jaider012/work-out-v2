@@ -1,0 +1,47 @@
+# Exercise the Workout tab routine search, the Home quick-routine tiles
+# and the "Start workout with this exercise" CTA on the exercise detail.
+appId: ${APP_ID:-host.exp.Exponent}
+---
+- launchApp
+
+# Routine search on the Workout tab
+- tapOn:
+    text: "Workout"
+- assertVisible:
+    id: "workout-search"
+- tapOn:
+    id: "workout-search"
+- inputText: "Push"
+- hideKeyboard
+- assertVisible: "Push Day"
+
+# Clear search
+- tapOn:
+    id: "workout-search"
+- eraseText: 20
+- hideKeyboard
+
+# Home quick-link
+- tapOn:
+    text: "Home"
+- assertVisible: "JUMP BACK IN"
+
+# Exercise detail CTA
+- tapOn:
+    text: "Profile"
+- tapOn:
+    text: "Browse all exercises"
+    optional: true
+- tapOn:
+    text: "Bench Press (Barbell)"
+- assertVisible:
+    id: "exercise-detail-start"
+- tapOn:
+    id: "exercise-detail-start"
+- assertVisible:
+    id: "active-workout-name"
+- tapOn:
+    id: "active-workout-discard"
+- tapOn:
+    text: "Discard"
+    optional: true
