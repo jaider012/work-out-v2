@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
     fontSize: Typography.hierarchy.caption.fontSize,
     lineHeight: Typography.hierarchy.caption.lineHeight,
     fontWeight: Typography.hierarchy.caption.fontWeight,
+    opacity: Typography.hierarchy.caption.opacity,
   },
   small: {
     fontSize: Typography.hierarchy.small.fontSize,
