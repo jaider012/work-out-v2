@@ -42,6 +42,8 @@ appId: ${APP_ID:-host.exp.Exponent}
     id: "workout-quick-start"
 - tapOn:
     id: "active-workout-add-exercise"
+- assertVisible:
+    id: "exercise-picker-search"
 - tapOn:
     id: "filter-equipment-barbell"
 - assertVisible: "Bench Press (Barbell)"

@@ -13,9 +13,12 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     id: "exercise-picker-search"
 - inputText: "Bench"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
     id: "exercise-row-bench-press"
+- waitForAnimationToEnd:
+    timeout: 2000
 - tapOn:
     id: "exercise-picker-add"
 
@@ -24,9 +27,12 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     id: "exercise-picker-search"
 - inputText: "Row"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
     id: "exercise-row-barbell-row"
+- waitForAnimationToEnd:
+    timeout: 2000
 - tapOn:
     id: "exercise-picker-add"
 

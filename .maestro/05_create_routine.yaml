@@ -14,7 +14,8 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     id: "routine-name"
 - inputText: "Maestro PPL Push"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 
 # Add exercises
 - tapOn:
@@ -24,16 +25,22 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     id: "exercise-picker-search"
 - inputText: "Bench"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
     id: "exercise-row-bench-press"
+- waitForAnimationToEnd:
+    timeout: 2000
 - tapOn:
     id: "exercise-picker-search"
 - eraseText: 20
 - inputText: "Overhead"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
     id: "exercise-row-overhead-press"
+- waitForAnimationToEnd:
+    timeout: 2000
 - tapOn:
     id: "exercise-picker-add"
 
