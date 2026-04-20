@@ -120,7 +120,7 @@ export default function SettingsScreen() {
         </View>
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-          <ThemedText type="caption" style={styles.sectionLabel}>
+          <ThemedText type="eyebrow" style={styles.sectionLabel}>
             UNITS
           </ThemedText>
           <Card style={styles.card}>
@@ -152,7 +152,7 @@ export default function SettingsScreen() {
             </View>
           </Card>
 
-          <ThemedText type="caption" style={styles.sectionLabel}>
+          <ThemedText type="eyebrow" style={styles.sectionLabel}>
             DATA
           </ThemedText>
           <Card style={styles.card}>
@@ -179,7 +179,7 @@ export default function SettingsScreen() {
             </ThemedText>
           </Card>
 
-          <ThemedText type="caption" style={styles.sectionLabel}>
+          <ThemedText type="eyebrow" style={styles.sectionLabel}>
             DANGER ZONE
           </ThemedText>
           <Card style={styles.card}>
@@ -193,7 +193,7 @@ export default function SettingsScreen() {
             />
           </Card>
 
-          <ThemedText type="caption" style={styles.sectionLabel}>
+          <ThemedText type="eyebrow" style={styles.sectionLabel}>
             ABOUT
           </ThemedText>
           <Card style={styles.card}>
@@ -235,11 +235,8 @@ const styles = StyleSheet.create({
   title: { color: Colors.neutral.textPrimary },
   content: { padding: Spacing.md, paddingBottom: Spacing.xxl },
   sectionLabel: {
-    color: Colors.neutral.textSecondary,
     marginBottom: Spacing.sm,
     marginTop: Spacing.lg,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
   },
   card: { marginBottom: Spacing.md },
   toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

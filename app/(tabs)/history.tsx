@@ -144,7 +144,7 @@ export default function HistoryScreen() {
               });
               return (
                 <View key={key} style={styles.section}>
-                  <ThemedText type="caption" style={styles.sectionLabel}>
+                  <ThemedText type="eyebrow" style={styles.sectionLabel}>
                     {monthLabel.toUpperCase()}
                   </ThemedText>
                   {list.map((workout) => (
@@ -223,10 +223,7 @@ const styles = StyleSheet.create({
   emptyTitle: { color: Colors.neutral.textPrimary },
   section: { marginBottom: Spacing.lg },
   sectionLabel: {
-    color: Colors.neutral.textSecondary,
     marginBottom: Spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
   },
   workoutCard: { marginBottom: Spacing.sm },
   workoutHeader: {

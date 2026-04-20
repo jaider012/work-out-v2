@@ -363,7 +363,7 @@ export default function ProfileScreen() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={styles.section}>
-      <ThemedText type="caption" style={styles.sectionLabel}>
+      <ThemedText type="eyebrow" style={styles.sectionLabel}>
         {title}
       </ThemedText>
       {children}
@@ -443,10 +443,7 @@ const styles = StyleSheet.create({
   statLabel: { color: Colors.neutral.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
   section: { marginBottom: Spacing.lg },
   sectionLabel: {
-    color: Colors.neutral.textSecondary,
     marginBottom: Spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
   },
   muted: { color: Colors.neutral.textSecondary },
   muscleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.sm },

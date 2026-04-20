@@ -66,7 +66,7 @@ export default function MeasurementsScreen() {
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <Card style={styles.summaryCard}>
-            <ThemedText type="caption" style={styles.label}>
+            <ThemedText type="eyebrow">
               CURRENT
             </ThemedText>
             <ThemedText type="hero" style={styles.weight}>
@@ -85,7 +85,7 @@ export default function MeasurementsScreen() {
           </Card>
 
           <Card style={styles.inputCard}>
-            <ThemedText type="caption" style={styles.label}>
+            <ThemedText type="eyebrow">
               LOG WEIGHT ({weightUnit.toUpperCase()})
             </ThemedText>
             <View style={styles.inputRow}>
@@ -107,7 +107,7 @@ export default function MeasurementsScreen() {
             </View>
           </Card>
 
-          <ThemedText type="caption" style={styles.sectionLabel}>
+          <ThemedText type="eyebrow" style={styles.sectionLabel}>
             HISTORY
           </ThemedText>
 
@@ -155,7 +155,6 @@ const styles = StyleSheet.create({
   title: { color: Colors.neutral.textPrimary },
   content: { padding: Spacing.md, paddingBottom: Spacing.xxl },
   summaryCard: { marginBottom: Spacing.md, alignItems: 'flex-start' },
-  label: { color: Colors.neutral.textSecondary, textTransform: 'uppercase', letterSpacing: 0.6 },
   weight: { color: Colors.neutral.textPrimary, marginTop: Spacing.xs },
   delta: { color: Colors.semantic.success, marginTop: 4 },
   inputCard: { marginBottom: Spacing.lg },
@@ -176,10 +175,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
   },
   sectionLabel: {
-    color: Colors.neutral.textSecondary,
     marginBottom: Spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
   },
   muted: { color: Colors.neutral.textSecondary },
   historyRow: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.sm },

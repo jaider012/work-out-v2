@@ -85,7 +85,7 @@ export default function WorkoutCompleteScreen() {
             <Stat label="Sets" value={String(totalSets(workout))} />
           </Card>
 
-          <ThemedText type="caption" style={styles.sectionLabel}>
+          <ThemedText type="eyebrow" style={styles.sectionLabel}>
             EXERCISES
           </ThemedText>
           {workout.exercises.map((ex) => {
@@ -189,10 +189,7 @@ const styles = StyleSheet.create({
   },
   statValue: { color: Colors.primary.accentViolet, fontWeight: '700' },
   sectionLabel: {
-    color: Colors.neutral.textSecondary,
     marginBottom: Spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
   },
   exerciseRow: { marginBottom: Spacing.sm },
   exerciseName: { color: Colors.neutral.textPrimary, fontWeight: '600' },

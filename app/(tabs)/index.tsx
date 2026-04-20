@@ -132,7 +132,7 @@ export default function HomeScreen() {
 
           {quickRoutines.length > 0 ? (
             <View style={styles.section}>
-              <ThemedText type="caption" style={styles.sectionTitle}>
+              <ThemedText type="eyebrow" style={styles.sectionTitle}>
                 JUMP BACK IN
               </ThemedText>
               <ScrollView
@@ -181,7 +181,7 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.section}>
-            <ThemedText type="caption" style={styles.sectionTitle}>
+            <ThemedText type="eyebrow" style={styles.sectionTitle}>
               YOUR FEED
             </ThemedText>
             {recent.length === 0 ? (
@@ -359,10 +359,7 @@ const styles = StyleSheet.create({
   activeName: { color: Colors.neutral.textPrimary },
   section: { marginTop: Spacing.md },
   sectionTitle: {
-    color: Colors.neutral.textSecondary,
     marginBottom: Spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
   },
   emptyTitle: { color: Colors.neutral.textPrimary, marginBottom: 4 },
   emptySubtitle: { color: Colors.neutral.textSecondary },

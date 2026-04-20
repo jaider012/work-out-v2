@@ -74,7 +74,7 @@ export default function RoutinePreviewScreen() {
             <Stat label="Planned sets" value={String(totalSets)} />
           </Card>
 
-          <ThemedText type="caption" style={styles.sectionLabel}>
+          <ThemedText type="eyebrow" style={styles.sectionLabel}>
             EXERCISES
           </ThemedText>
           {routine.exercises.map((ex, idx) => {
@@ -149,10 +149,7 @@ const styles = StyleSheet.create({
   },
   statValue: { color: Colors.primary.accentViolet, fontWeight: '700' },
   sectionLabel: {
-    color: Colors.neutral.textSecondary,
     marginBottom: Spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
   },
   exerciseRow: {
     flexDirection: 'row',

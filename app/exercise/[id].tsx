@@ -130,7 +130,7 @@ export default function ExerciseDetailScreen() {
           </Card>
 
           <Card style={styles.bestCard}>
-            <ThemedText type="caption" style={styles.cardLabel}>
+            <ThemedText type="eyebrow" style={styles.cardLabel}>
               HEAVIEST SET
             </ThemedText>
             <ThemedText type="h2" style={styles.bestText}>
@@ -145,14 +145,14 @@ export default function ExerciseDetailScreen() {
 
           {e1rmSeries.length > 1 ? (
             <Card style={styles.bestCard}>
-              <ThemedText type="caption" style={styles.cardLabel}>
+              <ThemedText type="eyebrow" style={styles.cardLabel}>
                 E1RM TREND
               </ThemedText>
               <Sparkline values={e1rmSeries.map((v) => fromKg(v, weightUnit))} width={300} height={64} />
             </Card>
           ) : null}
 
-          <ThemedText type="caption" style={styles.sectionLabel}>
+          <ThemedText type="eyebrow" style={styles.sectionLabel}>
             HISTORY
           </ThemedText>
 
@@ -232,16 +232,10 @@ const styles = StyleSheet.create({
   statValue: { color: Colors.neutral.textPrimary, fontWeight: '600' },
   bestCard: { marginBottom: Spacing.lg },
   cardLabel: {
-    color: Colors.neutral.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
     marginBottom: Spacing.xs,
   },
   bestText: { color: Colors.semantic.pr, fontWeight: '700' },
   sectionLabel: {
-    color: Colors.neutral.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
     marginBottom: Spacing.sm,
   },
   emptyText: { color: Colors.neutral.textSecondary, textAlign: 'center' },
