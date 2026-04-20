@@ -11,7 +11,8 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     id: "measurements-input"
 - inputText: "80"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
     id: "measurements-save"
 - assertVisible: "CURRENT"

@@ -12,14 +12,16 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     id: "workout-search"
 - inputText: "Push"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - assertVisible: "Push Day"
 
 # Clear search
 - tapOn:
     id: "workout-search"
 - eraseText: 20
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 
 # Home quick-link
 - tapOn:

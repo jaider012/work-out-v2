@@ -13,19 +13,18 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     id: "exercise-picker-search"
 - inputText: "Bench"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
     id: "exercise-row-bench-press"
+- waitForAnimationToEnd:
+    timeout: 2000
 - tapOn:
     id: "exercise-picker-add"
 
 # Cycle the first set's type badge: N → W → F → D → N
 - tapOn:
-    id: "set-type-${output.we ?? 'we-0'}-0"
-    optional: true
-- tapOn:
-    text: "1"
-    index: 0
+    id: "set-type-we-\\d+-\\d+-0"
     optional: true
 
 - tapOn:

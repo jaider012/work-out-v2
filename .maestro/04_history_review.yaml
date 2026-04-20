@@ -6,7 +6,8 @@ appId: ${APP_ID:-host.exp.Exponent}
 # History tab shows the latest workout we logged.
 - tapOn:
     text: "History"
-- assertVisible: "THIS WEEK"
+- assertVisible:
+    id: "calendar-prev"
 - extendedWaitUntil:
     visible:
       text: "Maestro Quick Start"

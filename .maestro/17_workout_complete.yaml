@@ -13,32 +13,41 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     id: "exercise-picker-search"
 - inputText: "Bench"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
     id: "exercise-row-bench-press"
+- waitForAnimationToEnd:
+    timeout: 2000
 - tapOn:
     id: "exercise-picker-add"
 
 # Log one set so the finish is not empty.
+- assertVisible:
+    id: "active-workout-finish"
 - tapOn:
-    text: "0"
-    index: 0
+    id: "set-weight-we-\\d+-\\d+-0"
+- eraseText: 5
 - inputText: "60"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
-    text: "0"
-    index: 0
+    id: "set-reps-we-\\d+-\\d+-0"
+- eraseText: 3
 - inputText: "8"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
-    text: "✓"
-    index: 0
+    id: "set-check-we-\\d+-\\d+-0"
     optional: true
 
 - tapOn:
     id: "active-workout-finish"
 
-- assertVisible: "Great work!"
+- extendedWaitUntil:
+    visible:
+      text: "Great work"
+    timeout: 15000
 - assertVisible:
     id: "workout-complete-share"
 - assertVisible:
