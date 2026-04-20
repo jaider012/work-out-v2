@@ -3,6 +3,7 @@ import * as Haptics from 'expo-haptics';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
+  Keyboard,
   Modal,
   Pressable,
   ScrollView,
@@ -183,6 +184,7 @@ export default function ActiveWorkoutScreen() {
     nextCompleted: boolean,
     restSeconds: number | undefined,
   ) => {
+    Keyboard.dismiss();
     updateSet(workoutExerciseId, setId, { completed: nextCompleted });
     if (nextCompleted) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
