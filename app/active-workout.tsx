@@ -28,6 +28,7 @@ import { useRestTimer } from '@/contexts/RestTimerContext';
 import { fromKg, useSettings } from '@/contexts/SettingsContext';
 import { DEFAULT_REST_SECONDS, useWorkouts } from '@/contexts/WorkoutContext';
 import { getExerciseById } from '@/data/exercises';
+import type { WorkoutSet } from '@/types/workout';
 import { bestOneRepMax, estimateOneRepMax, previousSession } from '@/utils/exerciseHistory';
 import { computeWorkoutVolumeKg, totalSets } from '@/utils/workoutStats';
 
@@ -183,11 +184,35 @@ export default function ActiveWorkoutScreen() {
     restSeconds: number | undefined,
   ) => {
     Keyboard.dismiss();
-    updateSet(workoutExerciseId, setId, { completed: nextCompleted });
-    if (nextCompleted) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
-      restTimer.start(restSeconds ?? DEFAULT_REST_SECONDS);
+
+    if (!nextCompleted || !activeWorkout) {
+      updateSet(workoutExerciseId, setId, { completed: nextCompleted });
+      return;
     }
+
+    // Hevy parity: tapping ✓ on an empty set commits the placeholder values
+    // from the previous session so VOLUME isn't stuck at 0 when users trust
+    // the gray placeholder text instead of typing.
+    const ex = activeWorkout.exercises.find((e) => e.id === workoutExerciseId);
+    const setIdx = ex ? ex.sets.findIndex((s) => s.id === setId) : -1;
+    const set = ex && setIdx >= 0 ? ex.sets[setIdx] : null;
+
+    const patch: Partial<WorkoutSet> = { completed: true };
+    if (ex && set && set.type !== 'warmup') {
+      const exercise = getExerciseById(ex.exerciseId);
+      const prev = previousSession(workouts, ex.exerciseId)[setIdx];
+      if (!set.weight) {
+        const fallbackWeight =
+          prev?.weight ??
+          (exercise?.equipment === 'bodyweight' ? latestBodyWeightKg : 0);
+        if (fallbackWeight) patch.weight = fallbackWeight;
+      }
+      if (!set.reps && prev?.reps) patch.reps = prev.reps;
+    }
+
+    updateSet(workoutExerciseId, setId, patch);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    restTimer.start(restSeconds ?? DEFAULT_REST_SECONDS);
   };
 
   const handleFinish = async () => {
