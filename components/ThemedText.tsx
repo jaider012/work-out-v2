@@ -1,12 +1,13 @@
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
+import { Colors } from '@/constants/Colors';
 import { Typography } from '@/constants/Typography';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'hero' | 'h1' | 'h2' | 'body' | 'caption' | 'small' | 'button' | 'link';
+  type?: 'default' | 'hero' | 'h1' | 'h2' | 'body' | 'caption' | 'small' | 'button' | 'link' | 'eyebrow';
 };
 
 export function ThemedText({
@@ -31,6 +32,7 @@ export function ThemedText({
         type === 'small' ? styles.small : undefined,
         type === 'button' ? styles.button : undefined,
         type === 'link' ? styles.link : undefined,
+        type === 'eyebrow' ? styles.eyebrow : undefined,
         style,
       ]}
       {...rest}
@@ -69,7 +71,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.hierarchy.caption.fontSize,
     lineHeight: Typography.hierarchy.caption.lineHeight,
     fontWeight: Typography.hierarchy.caption.fontWeight,
-    opacity: Typography.hierarchy.caption.opacity,
   },
   small: {
     fontSize: Typography.hierarchy.small.fontSize,
@@ -86,5 +87,13 @@ const styles = StyleSheet.create({
     lineHeight: Typography.hierarchy.body.lineHeight,
     fontWeight: Typography.hierarchy.body.fontWeight,
     color: '#4A90E2',
+  },
+  eyebrow: {
+    fontSize: Typography.hierarchy.caption.fontSize,
+    lineHeight: Typography.hierarchy.caption.lineHeight,
+    fontWeight: Typography.hierarchy.caption.fontWeight,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    color: Colors.neutral.textSecondary,
   },
 });
