@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { NumericSetInput } from '@/components/NumericSetInput';
 import { PlateCalculatorSheet } from '@/components/PlateCalculatorSheet';
 import { RestTimerOverlay } from '@/components/RestTimerOverlay';
 import { ThemedText } from '@/components/ThemedText';
@@ -563,16 +564,14 @@ export default function ActiveWorkoutScreen() {
                         >
                           <IconSymbol name="minus" size={14} color={Colors.neutral.textPrimary} />
                         </TouchableOpacity>
-                        <TextInput
+                        <NumericSetInput
+                          mode="weight"
                           testID={`set-weight-${workoutExercise.id}-${index}`}
-                          value={set.weight ? String(fromKg(set.weight, weightUnit)) : ''}
-                          onChangeText={(text) => {
-                            const parsed = parseFloat(text.replace(',', '.')) || 0;
-                            updateSet(workoutExercise.id, set.id, {
-                              weight: toKg(parsed, weightUnit),
-                            });
-                          }}
-                          keyboardType="decimal-pad"
+                          valueKg={set.weight}
+                          weightUnit={weightUnit}
+                          onCommitKg={(kg) =>
+                            updateSet(workoutExercise.id, set.id, { weight: kg })
+                          }
                           placeholder={
                             prev
                               ? String(fromKg(prev.weight, weightUnit))
@@ -599,15 +598,13 @@ export default function ActiveWorkoutScreen() {
                           <IconSymbol name="plus" size={14} color={Colors.neutral.textPrimary} />
                         </TouchableOpacity>
                       </View>
-                      <TextInput
+                      <NumericSetInput
+                        mode="reps"
                         testID={`set-reps-${workoutExercise.id}-${index}`}
-                        value={set.reps ? String(set.reps) : ''}
-                        onChangeText={(text) =>
-                          updateSet(workoutExercise.id, set.id, {
-                            reps: parseInt(text, 10) || 0,
-                          })
+                        value={set.reps}
+                        onCommit={(reps) =>
+                          updateSet(workoutExercise.id, set.id, { reps })
                         }
-                        keyboardType="number-pad"
                         placeholder={prev ? String(prev.reps) : '0'}
                         placeholderTextColor={Colors.neutral.textTertiary}
                         style={[styles.setInput, { flex: 0.8 }]}
