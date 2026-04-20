@@ -55,14 +55,6 @@ function setTypeLabel(type: SetType, index: number) {
 
 const DONE_ROW_TINT = 'rgba(52, 199, 89, 0.06)';
 
-const RPE_CYCLE: (number | undefined)[] = [undefined, 6, 7, 8, 9, 10];
-
-function nextRpe(current: number | undefined): number | undefined {
-  const idx = RPE_CYCLE.findIndex((v) => v === current);
-  const next = RPE_CYCLE[(idx + 1) % RPE_CYCLE.length];
-  return next;
-}
-
 function setTypeBadgeStyle(type: SetType) {
   switch (type) {
     case 'warmup':
@@ -505,9 +497,6 @@ export default function ActiveWorkoutScreen() {
                   <ThemedText type="label" style={[styles.setHeader, { flex: 0.8 }]}>
                     REPS
                   </ThemedText>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 0.6 }]}>
-                    RPE
-                  </ThemedText>
                   <ThemedText
                     type="label"
                     style={[styles.setHeader, { flex: 0.6, textAlign: 'right' }]}
@@ -623,20 +612,6 @@ export default function ActiveWorkoutScreen() {
                         placeholderTextColor={Colors.neutral.textTertiary}
                         style={[styles.setInput, { flex: 0.8 }]}
                       />
-                      <TouchableOpacity
-                        testID={`set-rpe-${workoutExercise.id}-${index}`}
-                        onPress={() =>
-                          updateSet(workoutExercise.id, set.id, {
-                            rpe: nextRpe(set.rpe),
-                          })
-                        }
-                        activeOpacity={0.7}
-                        style={[styles.rpeButton, { flex: 0.6 }]}
-                      >
-                        <ThemedText type="body" style={styles.rpeText}>
-                          {set.rpe ? `@${set.rpe}` : '—'}
-                        </ThemedText>
-                      </TouchableOpacity>
                       <View style={{ flex: 0.6, alignItems: 'flex-end' }}>
                         <TouchableOpacity
                           testID={`set-check-${workoutExercise.id}-${index}`}
@@ -916,16 +891,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   setTypeBadgeText: { color: Colors.neutral.textPrimary, fontWeight: '700' },
-  rpeButton: {
-    backgroundColor: Colors.neutral.elevatedBackground,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    marginRight: Spacing.xs,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rpeText: { color: Colors.neutral.textPrimary, fontWeight: '600' },
   stepper: {
     width: 22,
     height: 22,
