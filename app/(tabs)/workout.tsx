@@ -128,7 +128,7 @@ export default function WorkoutScreen() {
           </Card>
 
           <View style={styles.sectionHeaderRow}>
-            <ThemedText type="eyebrow" style={styles.sectionLabel}>
+            <ThemedText type="eyebrow">
               ROUTINES
             </ThemedText>
             <TouchableOpacity
@@ -209,7 +209,7 @@ export default function WorkoutScreen() {
           })}
 
           <View style={styles.sectionHeaderRow}>
-            <ThemedText type="eyebrow" style={styles.sectionLabel}>
+            <ThemedText type="eyebrow">
               DISCOVER
             </ThemedText>
           </View>
@@ -358,7 +358,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: Spacing.sm,
   },
-  sectionLabel: {},
   actionText: { color: Colors.primary.accentViolet, fontWeight: '600' },
   folder: { marginBottom: Spacing.lg },
   folderHeader: {

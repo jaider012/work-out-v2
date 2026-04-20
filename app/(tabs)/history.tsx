@@ -145,7 +145,7 @@ export default function HistoryScreen() {
               return (
                 <View key={key} style={styles.section}>
                   <ThemedText type="eyebrow" style={styles.sectionLabel}>
-                    {monthLabel.toUpperCase()}
+                    {monthLabel}
                   </ThemedText>
                   {list.map((workout) => (
                     <TouchableOpacity

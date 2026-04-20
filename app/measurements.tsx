@@ -86,7 +86,7 @@ export default function MeasurementsScreen() {
 
           <Card style={styles.inputCard}>
             <ThemedText type="eyebrow">
-              LOG WEIGHT ({weightUnit.toUpperCase()})
+              LOG WEIGHT ({weightUnit})
             </ThemedText>
             <View style={styles.inputRow}>
               <TextInput
