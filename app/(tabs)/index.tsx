@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   activityStrip: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: Spacing.lg,
+    marginVertical: Spacing.md,
     paddingHorizontal: Spacing.xs,
   },
   activityCol: { alignItems: 'center', gap: Spacing.xs },

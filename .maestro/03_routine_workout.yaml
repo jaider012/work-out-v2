@@ -30,6 +30,7 @@ appId: ${APP_ID:-host.exp.Exponent}
     text: "Finish"
     optional: true
 
-- assertVisible:
-    text: "History"
+- extendedWaitUntil:
+    visible:
+      text: "History"
     timeout: 10000

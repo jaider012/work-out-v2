@@ -41,7 +41,7 @@ const MAPPING = {
   'flame.fill': 'local-fire-department',
   'heart.fill': 'favorite',
   'bell.fill': 'notifications',
-  'trash': 'delete',
+  'trash': 'delete-outline',
   'pencil': 'edit',
   'arrow.left': 'arrow-back',
   'arrow.right': 'arrow-forward',

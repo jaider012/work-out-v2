@@ -15,14 +15,15 @@ env:
 - assertVisible: "Welcome Back"
 - tapOn:
     id: "sign-in-email"
-- inputText: ${EMAIL}
+- inputText: "${EMAIL}"
 - hideKeyboard
 - tapOn:
     id: "sign-in-password"
-- inputText: ${PASSWORD}
+- inputText: "${PASSWORD}"
 - hideKeyboard
 - tapOn:
     id: "sign-in-submit"
-- assertVisible:
-    text: "Welcome back"
+- extendedWaitUntil:
+    visible:
+      text: "Welcome back"
     timeout: 15000

@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
   FlatList,
+  Pressable,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -127,6 +128,7 @@ export default function ExercisePickerScreen() {
           data={MUSCLE_FILTERS}
           horizontal
           keyExtractor={(item) => `muscle-${item}`}
+          style={styles.filterList}
           contentContainerStyle={styles.filterRow}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => {
@@ -156,6 +158,7 @@ export default function ExercisePickerScreen() {
           data={EQUIPMENT_FILTERS}
           horizontal
           keyExtractor={(item) => `equipment-${item}`}
+          style={styles.filterList}
           contentContainerStyle={styles.filterRow}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => {
@@ -188,6 +191,7 @@ export default function ExercisePickerScreen() {
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
+          style={styles.resultsList}
           contentContainerStyle={styles.list}
           ItemSeparatorComponent={() => <View style={styles.divider} />}
           renderItem={({ item }) => (
@@ -224,10 +228,9 @@ function ExerciseRow({
   onPress: () => void;
 }) {
   return (
-    <TouchableOpacity
+    <Pressable
       testID={`exercise-row-${exercise.id}`}
       onPress={onPress}
-      activeOpacity={0.7}
       style={styles.exerciseRow}
     >
       <View
@@ -253,7 +256,7 @@ function ExerciseRow({
       ) : (
         <IconSymbol name="plus.circle.fill" size={22} color={Colors.neutral.textTertiary} />
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -286,14 +289,23 @@ const styles = StyleSheet.create({
     color: Colors.neutral.textPrimary,
     paddingVertical: Spacing.sm,
   },
-  filterRow: { paddingHorizontal: Spacing.md, gap: Spacing.xs, paddingBottom: Spacing.sm },
-  filterChip: {
+  filterList: { flexGrow: 0, flexShrink: 0 },
+  filterRow: {
     paddingHorizontal: Spacing.md,
-    paddingVertical: 6,
+    gap: Spacing.xs,
+    paddingBottom: Spacing.sm,
+    alignItems: 'center',
+  },
+  filterChip: {
+    height: 32,
+    paddingHorizontal: Spacing.md,
     borderRadius: 999,
     backgroundColor: Colors.neutral.cardBackground,
     marginRight: Spacing.xs,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  resultsList: { flex: 1 },
   filterChipActive: { backgroundColor: Colors.primary.accentViolet },
   filterText: { color: Colors.neutral.textSecondary },
   list: { paddingHorizontal: Spacing.md, paddingBottom: 120 },

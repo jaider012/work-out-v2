@@ -47,7 +47,8 @@ appId: ${APP_ID:-host.exp.Exponent}
 # Finish and expect a PR alert
 - tapOn:
     id: "active-workout-finish"
-- assertVisible:
-    text: "personal record"
+- extendedWaitUntil:
+    visible:
+      text: "personal record"
     timeout: 5000
     optional: true

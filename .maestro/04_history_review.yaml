@@ -7,8 +7,9 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     text: "History"
 - assertVisible: "THIS WEEK"
-- assertVisible:
-    text: "Maestro Quick Start"
+- extendedWaitUntil:
+    visible:
+      text: "Maestro Quick Start"
     timeout: 5000
     optional: true
 

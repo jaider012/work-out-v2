@@ -5,8 +5,8 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
     "e2e": "maestro test .maestro",
@@ -15,7 +15,10 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "testMatch": ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],
+    "testMatch": [
+      "**/__tests__/**/*.test.ts",
+      "**/__tests__/**/*.test.tsx"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!(jest-)?react-native|@react-native|react-native-worklets|@react-navigation|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-native-.*|@react-native-.*|expo-modules-core)"
     ]
@@ -27,7 +30,7 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
-    "@react-navigation/native": "^7.1.6",
+    "@react-navigation/native": "^7.2.2",
     "expo": "~55.0.15",
     "expo-blur": "~55.0.14",
     "expo-constants": "~55.0.14",

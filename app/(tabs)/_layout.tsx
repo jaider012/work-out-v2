@@ -1,41 +1,44 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ActiveWorkoutBanner } from '@/components/ActiveWorkoutBanner';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+
+const TAB_BAR_CONTENT_HEIGHT = 62;
+const TAB_BAR_MIN_PADDING_BOTTOM = 18;
 
 export default function TabLayout() {
-  const scheme = useColorScheme();
-  const colorScheme: 'light' | 'dark' = scheme === 'light' ? 'light' : 'dark';
+  const insets = useSafeAreaInsets();
+  const paddingBottom = Math.max(insets.bottom, TAB_BAR_MIN_PADDING_BOTTOM);
 
   return (
     <View style={{ flex: 1 }}>
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tabIconSelected,
-        tabBarInactiveTintColor: Colors[colorScheme].tabIconDefault,
+        tabBarActiveTintColor: Colors.dark.tabIconSelected,
+        tabBarInactiveTintColor: Colors.dark.tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            position: 'absolute',
-            backgroundColor: Colors.neutral.cardBackground,
-            borderTopColor: Colors.neutral.border,
-          },
-          default: {
-            backgroundColor: Colors.neutral.cardBackground,
-            borderTopColor: Colors.neutral.border,
-          },
-        }),
+        tabBarStyle: {
+          backgroundColor: Colors.neutral.cardBackground,
+          borderTopColor: Colors.neutral.border,
+          borderTopWidth: 1,
+          height: TAB_BAR_CONTENT_HEIGHT + paddingBottom,
+          paddingTop: 8,
+          paddingBottom,
+          elevation: 0,
+        },
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '500',
+          marginTop: 2,
+        },
+        tabBarIconStyle: {
+          marginBottom: 0,
         },
       }}
     >

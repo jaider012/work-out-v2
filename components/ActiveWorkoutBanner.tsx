@@ -1,28 +1,34 @@
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
-import { Spacing } from '@/constants/Layout';
 import { useWorkouts } from '@/contexts/WorkoutContext';
+import { getExerciseById } from '@/data/exercises';
 
-/**
- * Sticky banner shown across the tab screens whenever a workout is in
- * progress. Mirrors Hevy's "resume workout" bar that sits just above the
- * tab bar so you can jump back into logging from anywhere.
- */
+const TAB_BAR_CONTENT_HEIGHT = 62;
+const TAB_BAR_MIN_PADDING_BOTTOM = 18;
+const BANNER_GAP_ABOVE_TAB_BAR = 8;
+
 export function ActiveWorkoutBanner() {
   const router = useRouter();
-  const { activeWorkout } = useWorkouts();
+  const insets = useSafeAreaInsets();
+  const { activeWorkout, discardActiveWorkout } = useWorkouts();
   const [, force] = useState(0);
 
-  // Tick so the elapsed label stays fresh.
   useEffect(() => {
     if (!activeWorkout) return;
     const id = setInterval(() => force((n) => n + 1), 1000);
     return () => clearInterval(id);
+  }, [activeWorkout]);
+
+  const currentExerciseName = useMemo(() => {
+    if (!activeWorkout) return null;
+    const last = activeWorkout.exercises[activeWorkout.exercises.length - 1];
+    if (!last) return null;
+    return getExerciseById(last.exerciseId)?.name ?? null;
   }, [activeWorkout]);
 
   if (!activeWorkout) return null;
@@ -32,31 +38,67 @@ export function ActiveWorkoutBanner() {
     Math.round((Date.now() - new Date(activeWorkout.startedAt).getTime()) / 1000),
   );
 
+  const expand = () => router.push('/active-workout');
+
+  const handleDiscard = () => {
+    Alert.alert('Discard workout?', 'You will lose all your logged sets.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Discard',
+        style: 'destructive',
+        onPress: () => {
+          discardActiveWorkout();
+        },
+      },
+    ]);
+  };
+
+  const tabBarHeight = TAB_BAR_CONTENT_HEIGHT + Math.max(insets.bottom, TAB_BAR_MIN_PADDING_BOTTOM);
+
   return (
-    <Pressable
-      onPress={() => router.push('/active-workout')}
-      style={styles.wrapper}
-      testID="active-workout-banner"
+    <View
+      pointerEvents="box-none"
+      style={[
+        styles.wrapper,
+        { bottom: tabBarHeight + BANNER_GAP_ABOVE_TAB_BAR },
+      ]}
     >
-      <View style={styles.row}>
-        <View style={styles.iconWrap}>
-          <IconSymbol name="flame.fill" size={18} color={Colors.semantic.warning} />
+      <Pressable
+        onPress={expand}
+        style={styles.pill}
+        testID="active-workout-banner"
+        accessibilityRole="button"
+        accessibilityLabel="Resume active workout"
+      >
+        <View style={styles.sideCircle}>
+          <IconSymbol name="chevron.up" size={28} color={Colors.neutral.textPrimary} />
         </View>
-        <View style={{ flex: 1 }}>
-          <ThemedText type="caption" style={styles.label}>
-            WORKOUT IN PROGRESS
-          </ThemedText>
-          <ThemedText type="body" style={styles.name} numberOfLines={1}>
-            {activeWorkout.name}
-          </ThemedText>
+        <View style={styles.center}>
+          <View style={styles.titleRow}>
+            <View style={styles.statusDot} />
+            <Text style={styles.titleText} numberOfLines={1}>
+              Workout
+              <Text style={styles.timerText}>  {format(elapsed)}</Text>
+            </Text>
+          </View>
+          {currentExerciseName ? (
+            <Text style={styles.subtitle} numberOfLines={1}>
+              {currentExerciseName}
+            </Text>
+          ) : null}
         </View>
-        <View style={styles.timerBox}>
-          <ThemedText type="body" style={styles.timer}>
-            {format(elapsed)}
-          </ThemedText>
-        </View>
-      </View>
-    </Pressable>
+        <Pressable
+          onPress={handleDiscard}
+          hitSlop={8}
+          style={({ pressed }) => [styles.sideCircle, pressed && styles.sideCirclePressed]}
+          testID="active-workout-banner-discard"
+          accessibilityRole="button"
+          accessibilityLabel="Discard workout"
+        >
+          <IconSymbol name="trash" size={24} color={Colors.semantic.error} />
+        </Pressable>
+      </Pressable>
+    </View>
   );
 }
 
@@ -64,54 +106,79 @@ function format(seconds: number) {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
-  if (h) return `${h}:${pad(m)}:${pad(s)}`;
-  return `${pad(m)}:${pad(s)}`;
+  if (h) return `${h}h ${pad(m)}min ${pad(s)}s`;
+  return `${m}min ${pad(s)}s`;
 }
 
 function pad(n: number) {
   return String(n).padStart(2, '0');
 }
 
+const STATUS_DOT_SIZE = 10;
+const SIDE_CIRCLE_SIZE = 52;
+const PILL_HEIGHT = 68;
+
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 82,
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: 12,
     zIndex: 20,
   },
-  row: {
+  pill: {
+    height: PILL_HEIGHT,
+    backgroundColor: Colors.neutral.cardBackground,
+    borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.neutral.elevatedBackground,
-    borderRadius: 14,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    gap: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.primary.accentViolet,
+    paddingHorizontal: 8,
+    gap: 12,
     shadowColor: '#000',
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 10,
+    shadowOpacity: 0.5,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
   },
-  iconWrap: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.neutral.cardBackground,
+  sideCircle: {
+    width: SIDE_CIRCLE_SIZE,
+    height: SIDE_CIRCLE_SIZE,
+    borderRadius: SIDE_CIRCLE_SIZE / 2,
+    backgroundColor: Colors.neutral.elevatedBackground,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { color: Colors.neutral.textSecondary, letterSpacing: 0.6 },
-  name: { color: Colors.neutral.textPrimary, fontWeight: '700' },
-  timerBox: {
-    paddingVertical: 4,
-    paddingHorizontal: Spacing.sm,
-    backgroundColor: Colors.primary.accentViolet,
-    borderRadius: 8,
+  sideCirclePressed: {
+    opacity: 0.7,
   },
-  timer: { color: '#fff', fontWeight: '700', fontVariant: ['tabular-nums'] },
+  center: {
+    flex: 1,
+    minWidth: 0,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  statusDot: {
+    width: STATUS_DOT_SIZE,
+    height: STATUS_DOT_SIZE,
+    borderRadius: STATUS_DOT_SIZE / 2,
+    backgroundColor: Colors.semantic.success,
+  },
+  titleText: {
+    flexShrink: 1,
+    color: Colors.neutral.textPrimary,
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  timerText: {
+    fontWeight: '500',
+  },
+  subtitle: {
+    color: Colors.neutral.textSecondary,
+    fontSize: 14,
+    marginTop: 2,
+    marginLeft: STATUS_DOT_SIZE + 8,
+  },
 });

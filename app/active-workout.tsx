@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -23,12 +23,12 @@ import { Button } from '@/components/ui/Button';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { Spacing } from '@/constants/Layout';
-import { DEFAULT_REST_SECONDS, useWorkouts } from '@/contexts/WorkoutContext';
 import { useMeasurements } from '@/contexts/MeasurementsContext';
 import { useRestTimer } from '@/contexts/RestTimerContext';
 import { fromKg, useSettings } from '@/contexts/SettingsContext';
+import { DEFAULT_REST_SECONDS, useWorkouts } from '@/contexts/WorkoutContext';
 import { getExerciseById } from '@/data/exercises';
-import { previousSession, estimateOneRepMax, bestOneRepMax } from '@/utils/exerciseHistory';
+import { bestOneRepMax, estimateOneRepMax, previousSession } from '@/utils/exerciseHistory';
 import { computeWorkoutVolumeKg, totalSets } from '@/utils/workoutStats';
 
 const REST_PRESETS = [60, 90, 120, 180, 240];
@@ -290,14 +290,7 @@ export default function ActiveWorkoutScreen() {
             </ThemedText>
           </View>
           <Pressable onPress={() => setSaveSheetOpen(true)} hitSlop={12}>
-            <View style={styles.statBlock}>
-              <ThemedText type="label" style={styles.statLabel}>
-                LAST
-              </ThemedText>
-              <ThemedText type="body" style={styles.statValue}>
-                {lastWorkoutAgo ?? '—'}
-              </ThemedText>
-            </View>
+          
             <View style={styles.statBlock}>
               <ThemedText type="label" style={styles.statLabel}>
                 ROUTINE

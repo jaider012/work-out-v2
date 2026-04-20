@@ -1,16 +1,13 @@
 # Quick Start flow: empty workout → add exercise → log a set → finish.
 # Assumes the user is already signed in (run 01_sign_in.yaml first or on a
 # pre-authenticated build).
-appId: ${APP_ID:-host.exp.Exponent}
+appId: com.jaider012.work-out-v2
 ---
-- launchApp
-- tapOn:
-    text: "Workout"
-    index: 0
+# Assumes the previous flow left the app signed in and foregrounded.
 - assertVisible:
-    id: "workout-quick-start"
+    id: "home-start-empty-workout"
 - tapOn:
-    id: "workout-quick-start"
+    id: "home-start-empty-workout"
 
 # Active workout modal opens
 - assertVisible:
@@ -21,7 +18,8 @@ appId: ${APP_ID:-host.exp.Exponent}
     id: "active-workout-name"
 - eraseText: 50
 - inputText: "Maestro Quick Start"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 
 # Add an exercise
 - tapOn:
@@ -31,36 +29,38 @@ appId: ${APP_ID:-host.exp.Exponent}
 - tapOn:
     id: "exercise-picker-search"
 - inputText: "Bench Press"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
     id: "exercise-row-bench-press"
+- waitForAnimationToEnd:
+    timeout: 2000
 - tapOn:
     id: "exercise-picker-add"
 
 # Log first set: 60 kg × 8 reps and tick it off
 - assertVisible:
-    text: "Bench Press (Barbell)"
+    id: "active-workout-finish"
 - tapOn:
-    id: "set-weight-${output.we ?? 'we-0'}-0"
+    id: "set-weight-we-\\d+-\\d+-0"
+- eraseText: 5
+- inputText: "60"
+- hideKeyboard:
     optional: true
 - tapOn:
-    text: "0"
-    index: 0
-- inputText: "60"
-- hideKeyboard
-- tapOn:
-    text: "0"
-    index: 0
+    id: "set-reps-we-\\d+-\\d+-0"
+- eraseText: 3
 - inputText: "8"
-- hideKeyboard
+- hideKeyboard:
+    optional: true
 - tapOn:
-    text: "✓"
-    index: 0
+    id: "set-check-we-\\d+-\\d+-0"
     optional: true
 
-# Finish workout
+# Finish workout → celebration screen
 - tapOn:
     id: "active-workout-finish"
-- assertVisible:
-    text: "Welcome back"
-    timeout: 10000
+- extendedWaitUntil:
+    visible:
+      text: "Great work"
+    timeout: 15000

@@ -44,6 +44,7 @@ appId: ${APP_ID:-host.exp.Exponent}
     id: "routine-save"
 
 # Verify routine appears in the workout tab list
-- assertVisible:
-    text: "Maestro PPL Push"
+- extendedWaitUntil:
+    visible:
+      text: "Maestro PPL Push"
     timeout: 5000

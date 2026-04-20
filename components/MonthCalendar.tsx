@@ -138,5 +138,5 @@ const styles = StyleSheet.create({
   cellActive: { backgroundColor: 'rgba(124,92,255,0.2)' },
   cellToday: { borderWidth: 1, borderColor: Colors.neutral.textPrimary },
   cellSelected: { backgroundColor: Colors.primary.accentViolet },
-  cellText: { color: Colors.neutral.textSecondary },
+  cellText: { color: Colors.neutral.textPrimary },
 });
