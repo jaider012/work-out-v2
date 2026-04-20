@@ -53,6 +53,8 @@ function setTypeLabel(type: SetType, index: number) {
   }
 }
 
+const DONE_ROW_TINT = 'rgba(52, 199, 89, 0.06)';
+
 const RPE_CYCLE: (number | undefined)[] = [undefined, 6, 7, 8, 9, 10];
 
 function nextRpe(current: number | undefined): number | undefined {
@@ -64,13 +66,29 @@ function nextRpe(current: number | undefined): number | undefined {
 function setTypeBadgeStyle(type: SetType) {
   switch (type) {
     case 'warmup':
-      return { backgroundColor: '#3A4A7A', borderColor: '#7C9CFF' };
+      return {
+        backgroundColor: 'transparent',
+        borderColor: Colors.semantic.pr,
+        textColor: Colors.semantic.pr,
+      };
     case 'failure':
-      return { backgroundColor: '#5C2A2A', borderColor: '#FF7070' };
+      return {
+        backgroundColor: Colors.semantic.error,
+        borderColor: Colors.semantic.error,
+        textColor: Colors.neutral.textPrimary,
+      };
     case 'drop':
-      return { backgroundColor: '#4A3A7A', borderColor: '#A07CFF' };
+      return {
+        backgroundColor: Colors.primary.accentViolet,
+        borderColor: Colors.primary.accentViolet,
+        textColor: Colors.neutral.textPrimary,
+      };
     default:
-      return { backgroundColor: 'transparent', borderColor: 'transparent' };
+      return {
+        backgroundColor: Colors.neutral.elevatedBackground,
+        borderColor: 'transparent',
+        textColor: Colors.neutral.textPrimary,
+      };
   }
 }
 
@@ -372,6 +390,12 @@ export default function ActiveWorkoutScreen() {
                           </ThemedText>
                         </View>
                       ) : null}
+                      <IconSymbol
+                        name="figure.strengthtraining.traditional"
+                        size={20}
+                        color={Colors.primary.accentViolet}
+                        style={{ marginRight: Spacing.sm }}
+                      />
                       <ThemedText type="h2" style={styles.exerciseName}>
                         {exercise?.name ?? 'Exercise'}
                       </ThemedText>
@@ -497,12 +521,14 @@ export default function ActiveWorkoutScreen() {
                   const oneRm = estimateOneRepMax(set.weight, set.reps);
                   const isPR =
                     set.completed && oneRm > 0 && oneRm > previousBest1Rm;
+                  const { textColor: setBadgeTextColor, ...setBadgeViewStyle } =
+                    setTypeBadgeStyle(set.type ?? 'normal');
                   return (
                     <View
                       key={set.id}
                       style={[
                         styles.setRow,
-                        set.completed && { backgroundColor: Colors.neutral.elevatedBackground },
+                        set.completed && { backgroundColor: DONE_ROW_TINT },
                       ]}
                     >
                       <View style={{ flex: 0.6, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -513,10 +539,13 @@ export default function ActiveWorkoutScreen() {
                             })
                           }
                           hitSlop={6}
-                          style={[styles.setTypeBadge, setTypeBadgeStyle(set.type ?? 'normal')]}
+                          style={[styles.setTypeBadge, setBadgeViewStyle]}
                           testID={`set-type-${workoutExercise.id}-${index}`}
                         >
-                          <ThemedText type="caption" style={styles.setTypeBadgeText}>
+                          <ThemedText
+                            type="caption"
+                            style={[styles.setTypeBadgeText, { color: setBadgeTextColor }]}
+                          >
                             {setTypeLabel(set.type ?? 'normal', index)}
                           </ThemedText>
                         </TouchableOpacity>
