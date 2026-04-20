@@ -75,7 +75,7 @@ export default function SignInScreen() {
 
               <View style={styles.formContainer}>
                 <View style={styles.inputContainer}>
-                  <ThemedText type="caption" style={styles.label}>
+                  <ThemedText type="label" style={styles.label}>
                     EMAIL ADDRESS
                   </ThemedText>
                   <TextInput
@@ -92,7 +92,7 @@ export default function SignInScreen() {
                 </View>
 
                 <View style={styles.inputContainer}>
-                  <ThemedText type="caption" style={styles.label}>
+                  <ThemedText type="label" style={styles.label}>
                     PASSWORD
                   </ThemedText>
                   <TextInput
@@ -180,10 +180,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   label: {
-    color: Colors.neutral.textSecondary,
     marginBottom: Spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   input: {
     height: Layout.input.height,

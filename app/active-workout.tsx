@@ -243,7 +243,7 @@ export default function ActiveWorkoutScreen() {
             <IconSymbol name="chevron.down" size={26} color={Colors.neutral.textPrimary} />
           </TouchableOpacity>
           <View style={{ flex: 1, alignItems: 'center' }}>
-            <ThemedText type="caption" style={styles.timerLabel}>
+            <ThemedText type="label">
               DURATION
             </ThemedText>
             <ThemedText type="h2" style={styles.timer}>
@@ -263,7 +263,7 @@ export default function ActiveWorkoutScreen() {
 
         <View style={styles.statsRow}>
           <View style={styles.statBlock}>
-            <ThemedText type="caption" style={styles.statLabel}>
+            <ThemedText type="label" style={styles.statLabel}>
               VOLUME
             </ThemedText>
             <ThemedText type="body" style={styles.statValue}>
@@ -271,7 +271,7 @@ export default function ActiveWorkoutScreen() {
             </ThemedText>
           </View>
           <View style={styles.statBlock}>
-            <ThemedText type="caption" style={styles.statLabel}>
+            <ThemedText type="label" style={styles.statLabel}>
               SETS
             </ThemedText>
             <ThemedText type="body" style={styles.statValue}>
@@ -280,7 +280,7 @@ export default function ActiveWorkoutScreen() {
           </View>
           <Pressable onPress={() => setSaveSheetOpen(true)} hitSlop={12}>
             <View style={styles.statBlock}>
-              <ThemedText type="caption" style={styles.statLabel}>
+              <ThemedText type="label" style={styles.statLabel}>
                 LAST
               </ThemedText>
               <ThemedText type="body" style={styles.statValue}>
@@ -288,7 +288,7 @@ export default function ActiveWorkoutScreen() {
               </ThemedText>
             </View>
             <View style={styles.statBlock}>
-              <ThemedText type="caption" style={styles.statLabel}>
+              <ThemedText type="label" style={styles.statLabel}>
                 ROUTINE
               </ThemedText>
               <ThemedText type="body" style={[styles.statValue, { color: Colors.primary.accentViolet }]}>
@@ -469,23 +469,23 @@ export default function ActiveWorkoutScreen() {
                 />
 
                 <View style={styles.setHeaderRow}>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 0.6 }]}>
+                  <ThemedText type="label" style={[styles.setHeader, { flex: 0.6 }]}>
                     SET
                   </ThemedText>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1.2 }]}>
+                  <ThemedText type="label" style={[styles.setHeader, { flex: 1.2 }]}>
                     PREVIOUS
                   </ThemedText>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 1 }]}>
+                  <ThemedText type="label" style={[styles.setHeader, { flex: 1 }]}>
                     {weightUnit.toUpperCase()}
                   </ThemedText>
-                  <ThemedText type="caption" style={[styles.setHeader, { flex: 0.8 }]}>
+                  <ThemedText type="label" style={[styles.setHeader, { flex: 0.8 }]}>
                     REPS
                   </ThemedText>
                   <ThemedText type="caption" style={[styles.setHeader, { flex: 0.6 }]}>
                     RPE
                   </ThemedText>
                   <ThemedText
-                    type="caption"
+                    type="label"
                     style={[styles.setHeader, { flex: 0.6, textAlign: 'right' }]}
                   >
                     ✓
@@ -792,7 +792,6 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.neutral.border,
     gap: Spacing.sm,
   },
-  timerLabel: { color: Colors.neutral.textSecondary },
   timer: { color: Colors.neutral.textPrimary },
   finishText: { color: Colors.primary.accentViolet, fontWeight: '700' },
   statsRow: {
@@ -802,7 +801,7 @@ const styles = StyleSheet.create({
     gap: Spacing.lg,
   },
   statBlock: { flex: 1 },
-  statLabel: { color: Colors.neutral.textSecondary },
+  statLabel: {},
   statValue: { color: Colors.neutral.textPrimary, fontWeight: '600' },
   content: { padding: Spacing.md, paddingBottom: 140 },
   nameInput: {
@@ -868,11 +867,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xs,
     paddingVertical: 4,
   },
-  setHeader: {
-    color: Colors.neutral.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
+  setHeader: {},
   setRow: {
     flexDirection: 'row',
     alignItems: 'center',

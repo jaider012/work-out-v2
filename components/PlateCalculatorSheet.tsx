@@ -27,7 +27,7 @@ export function PlateCalculatorSheet({ visible, targetKg, onClose }: PlateCalcul
           <ThemedText type="h2" style={styles.title}>
             Plate calculator
           </ThemedText>
-          <ThemedText type="caption" style={styles.muted}>
+          <ThemedText type="label" style={styles.muted}>
             Target: {targetInUnit} {weightUnit} · Bar: {breakdown.bar} {weightUnit}
           </ThemedText>
 
@@ -37,7 +37,7 @@ export function PlateCalculatorSheet({ visible, targetKg, onClose }: PlateCalcul
             </ThemedText>
           ) : (
             <View style={styles.plateList}>
-              <ThemedText type="caption" style={styles.muted}>
+              <ThemedText type="label" style={styles.muted}>
                 PER SIDE
               </ThemedText>
               {breakdown.perSide.map((plate) => (
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   title: { color: Colors.neutral.textPrimary },
-  muted: { color: Colors.neutral.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
+  muted: {},
   bodyText: { color: Colors.neutral.textPrimary },
   plateList: { gap: Spacing.xs, marginTop: Spacing.xs },
   plateRow: {

@@ -117,7 +117,7 @@ export default function RoutinePreviewScreen() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ flex: 1 }}>
-      <ThemedText type="caption" style={styles.statLabel}>
+      <ThemedText type="label">
         {label}
       </ThemedText>
       <ThemedText type="h2" style={styles.statValue}>
@@ -142,11 +142,6 @@ const styles = StyleSheet.create({
   title: { color: Colors.neutral.textPrimary, flex: 1, textAlign: 'center' },
   content: { padding: Spacing.md, paddingBottom: Spacing.xxl },
   statsCard: { flexDirection: 'row', marginBottom: Spacing.lg, gap: Spacing.md },
-  statLabel: {
-    color: Colors.neutral.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
   statValue: { color: Colors.primary.accentViolet, fontWeight: '700' },
   sectionLabel: {
     marginBottom: Spacing.sm,

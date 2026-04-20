@@ -133,7 +133,7 @@ export default function WorkoutCompleteScreen() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
-      <ThemedText type="caption" style={styles.statLabel}>
+      <ThemedText type="label">
         {label}
       </ThemedText>
       <ThemedText type="h2" style={styles.statValue}>
@@ -181,11 +181,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: Spacing.lg,
     paddingVertical: Spacing.lg,
-  },
-  statLabel: {
-    color: Colors.neutral.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   statValue: { color: Colors.primary.accentViolet, fontWeight: '700' },
   sectionLabel: {

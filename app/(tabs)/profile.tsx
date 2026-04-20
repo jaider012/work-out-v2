@@ -377,7 +377,7 @@ function Stat({ title, value }: { title: string; value: string }) {
       <ThemedText type="h2" style={styles.statValue}>
         {value}
       </ThemedText>
-      <ThemedText type="caption" style={styles.statLabel}>
+      <ThemedText type="label">
         {title}
       </ThemedText>
     </View>
@@ -440,7 +440,6 @@ const styles = StyleSheet.create({
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap' },
   statBlock: { width: '50%', alignItems: 'flex-start', marginBottom: Spacing.sm },
   statValue: { color: Colors.primary.accentViolet, fontWeight: '700' },
-  statLabel: { color: Colors.neutral.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
   section: { marginBottom: Spacing.lg },
   sectionLabel: {
     marginBottom: Spacing.sm,
