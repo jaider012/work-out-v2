@@ -7,7 +7,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'hero' | 'h1' | 'h2' | 'body' | 'caption' | 'small' | 'button' | 'link' | 'eyebrow';
+  type?: 'default' | 'hero' | 'h1' | 'h2' | 'body' | 'caption' | 'small' | 'button' | 'link' | 'eyebrow' | 'label';
 };
 
 export function ThemedText({
@@ -33,6 +33,7 @@ export function ThemedText({
         type === 'button' ? styles.button : undefined,
         type === 'link' ? styles.link : undefined,
         type === 'eyebrow' ? styles.eyebrow : undefined,
+        type === 'label' ? styles.label : undefined,
         style,
       ]}
       {...rest}
@@ -95,6 +96,14 @@ const styles = StyleSheet.create({
     fontWeight: Typography.hierarchy.caption.fontWeight,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
+    color: Colors.neutral.textSecondary,
+  },
+  label: {
+    fontSize: Typography.hierarchy.caption.fontSize,
+    lineHeight: Typography.hierarchy.caption.lineHeight,
+    fontWeight: Typography.hierarchy.caption.fontWeight,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
     color: Colors.neutral.textSecondary,
   },
 });
