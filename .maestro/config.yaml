@@ -21,7 +21,7 @@ executionOrder:
     - 11_banner_and_repeat.yaml
     - 12_notes_and_import.yaml
     - 13_supersets_and_plates.yaml
-    - 14_steppers_and_clear.yaml
+    - 14_activity_strip_and_clear.yaml
     - 15_routine_search_and_quick_links.yaml
     - 16_routine_preview.yaml
     - 17_workout_complete.yaml
