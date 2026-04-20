@@ -36,25 +36,27 @@ export function NumericSetInput(props: NumericSetInputProps) {
       : formatDisplay(props.value, 'reps');
 
   const [buffer, setBuffer] = useState(externalDisplay);
-  const focusedRef = useRef(false);
+  const lastCommittedRef = useRef(externalDisplay);
 
   useEffect(() => {
-    if (focusedRef.current) return;
+    if (externalDisplay === lastCommittedRef.current) return;
+    lastCommittedRef.current = externalDisplay;
     setBuffer(externalDisplay);
   }, [externalDisplay]);
-
-  const handleFocus = useCallback(() => {
-    focusedRef.current = true;
-  }, []);
 
   const pushParsed = useCallback(
     (text: string) => {
       const parsed = parseBuffer(text, mode);
       if (mode === 'weight') {
         const kg = parsed > 0 ? toKg(parsed, props.weightUnit) : 0;
+        lastCommittedRef.current = formatDisplay(
+          kg ? fromKg(kg, props.weightUnit) : 0,
+          'weight',
+        );
         props.onCommitKg(kg);
       } else {
         const reps = parsed > 0 ? Math.round(parsed) : 0;
+        lastCommittedRef.current = formatDisplay(reps, 'reps');
         props.onCommit(reps);
       }
     },
@@ -70,25 +72,15 @@ export function NumericSetInput(props: NumericSetInputProps) {
   );
 
   const commit = useCallback(() => {
-    focusedRef.current = false;
     pushParsed(buffer);
-    if (mode === 'weight') {
-      const parsed = parseBuffer(buffer, mode);
-      const kg = parsed > 0 ? toKg(parsed, props.weightUnit) : 0;
-      setBuffer(formatDisplay(kg ? fromKg(kg, props.weightUnit) : 0, 'weight'));
-    } else {
-      const parsed = parseBuffer(buffer, mode);
-      const reps = parsed > 0 ? Math.round(parsed) : 0;
-      setBuffer(formatDisplay(reps, 'reps'));
-    }
-  }, [buffer, mode, props, pushParsed]);
+    setBuffer(lastCommittedRef.current);
+  }, [buffer, pushParsed]);
 
   return (
     <TextInput
       testID={testID}
       value={buffer}
       onChangeText={handleChange}
-      onFocus={handleFocus}
       onBlur={commit}
       onEndEditing={commit}
       keyboardType={mode === 'weight' ? 'decimal-pad' : 'number-pad'}
